@@ -1,3 +1,6 @@
+# Pdf template creator
+tools/create-pdf-template/output
+
 # Logs
 logs
 *.log
