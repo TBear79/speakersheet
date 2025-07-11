@@ -78,6 +78,23 @@ export async function createPdf(metaJson) {
     y -= boxHeight + 10;
   };
 
+  const createHiddenJsonField = () => {
+    const form = pdfDoc.getForm();
+    const hiddenField = form.createTextField('_meta');
+    hiddenField.setText(JSON.stringify(metaJson));
+    hiddenField.enableReadOnly();
+      
+    // Gem det lille felt nederst i margin og uden visning
+    hiddenField.addToPage(currentPage, {
+      x: -5000,
+      y: -5000,
+      width: 0.1,
+      height: 0.1,
+      borderWidth: 0,
+      textColor: rgb(1, 1, 1), // hvid tekst
+    });
+  }
+
   drawHeader();
 
   drawSection('Menighed', [
@@ -139,13 +156,7 @@ export async function createPdf(metaJson) {
     drawSection(`${speaker.name}`, [...speakerLines, ...talkLines]);
   }
 
-  // Embed JSON som skjult tekstfelt
-  currentPage.drawText(JSON.stringify(metaJson), {
-    x: -5000,
-    y: -5000,
-    size: 0.1,
-    color: rgb(1, 1, 1)
-  });
+  createHiddenJsonField();
 
   return await pdfDoc.save(); // Returnerer som buffer
 }
