@@ -5,19 +5,15 @@
     "main": "create-pdf-template.js",
     "type": "module",
     "scripts": {
-      "start": "node create-pdf-template.js"
+        "start": "node create-pdf-template.js"
     },
     "keywords": [
-      "pdf",
-      "generator",
-      "metadata",
-      "speakersheet",
-      "pdf-lib"
+        "pdf",
+        "generator",
+        "metadata",
+        "speakersheet",
+        "pdf-lib"
     ],
     "author": "Din Organisation",
-    "license": "UNLICENSED",
-    "dependencies": {
-      "pdf-lib": "^1.17.1"
-    }
-  }
-  
+    "license": "UNLICENSED"
+}

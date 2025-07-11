@@ -1,0 +1,23 @@
+{
+    "name": "speakersheet-app",
+    "version": "1.0.0",
+    "description": "PDF generation core logic for SpeakerSheet app",
+    "type": "module",
+    "main": "pdf/createPdf.js",
+    "exports": {
+        "./pdf/createPdf.js": "./pdf/createPdf.js"
+    },
+    "scripts": {
+        "test": "echo \"No tests defined\" && exit 0"
+    },
+    "keywords": [
+        "pdf",
+        "pdf-lib",
+        "speakersheet"
+    ],
+    "author": "The Right Foot",
+    "license": "MIT",
+    "dependencies": {
+        "pdf-lib": "^1.17.1"
+    }
+}
