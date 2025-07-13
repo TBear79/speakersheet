@@ -3,12 +3,10 @@
     "version": "1.0.0",
     "description": "PDF generation core logic for SpeakerSheet app",
     "type": "module",
-    "main": "pdf/createPdf.js",
-    "exports": {
-        "./pdf/createPdf.js": "./pdf/createPdf.js"
-    },
+    "main": "web/server.js",
     "scripts": {
-        "test": "echo \"No tests defined\" && exit 0"
+        "test": "echo \"No tests defined\" && exit 0",
+        "start": "nodemon web/server.js"
     },
     "keywords": [
         "pdf",
@@ -18,6 +16,12 @@
     "author": "The Right Foot",
     "license": "MIT",
     "dependencies": {
+        "express": "^4.19.0",
+        "express-handlebars": "^7.0.7",
         "pdf-lib": "^1.17.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10",
+        "reload": "^3.4.1"
     }
 }
