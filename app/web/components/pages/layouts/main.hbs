@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>{{title}}</title>
-  <link rel="stylesheet" href="/css/main.css" />
-  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="icon" href="gfx/favicon.ico" />
   <script src="/reload/reload.js"></script>
+  <script type="module" src="/js/components.js"></script>
 </head>
 <body>
   <header>
-    <img src="/assets/gfx/logo.png" alt="Logo" height="80" />
+    <app-logo></app-logo>
+    {{!-- <img src="/assets/gfx/logo.png" alt="Logo" height="80" /> --}}
   </header>
 
   <main>
