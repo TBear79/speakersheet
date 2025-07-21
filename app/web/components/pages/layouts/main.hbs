@@ -1,25 +1,40 @@
 <!DOCTYPE html>
 <html lang="da">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>{{title}}</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="icon" href="gfx/favicon.ico" />
-  <script src="/reload/reload.js"></script>
-  <script type="module" src="/js/components.js"></script>
+    <meta charset="UTF-8" />
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="icon" href="gfx/favicon.ico" />
+    <script src="/reload/reload.js"></script>
+    <script type="module" src="/js/components.js"></script>
 </head>
+
 <body>
-  <header>
-    <app-logo></app-logo>
-    {{!-- <img src="/assets/gfx/logo.png" alt="Logo" height="80" /> --}}
-  </header>
+    <div class="page-layout">
+        <header class="site-header">
+            <div class="content">
+                <h1>
+                    <app-logo></app-logo>
+                </h1>
+            </div>
+        </header>
 
-  <main>
-    {{{body}}}
-  </main>
+        <main class="site-main">
+            <div class="content">
+                <app-card>
+                    <span slot="card-header-slot">My fancy card</span>
+                    <span slot="card-content-slot">{{{body}}}</span>
+                </app-card>
+            </div>
+        </main>
 
-  <footer>
-    <small>© SpeakerSheet 2025</small>
-  </footer>
+        <footer class="site-footer">
+            <div class="content">
+                <small>© SpeakerSheet 2025</small>
+            </div>
+        </footer>
+    </div>
 </body>
+
 </html>

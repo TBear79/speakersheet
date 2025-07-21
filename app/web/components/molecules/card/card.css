@@ -1,0 +1,14 @@
+.card > h2 {
+  color: black;
+  margin-bottom: 0.3em;
+  margin-left: 0.3em;
+}
+
+.card-content
+{
+  max-width: var(--content-max-width);
+  background: white;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+}
