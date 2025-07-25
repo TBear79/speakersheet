@@ -1,0 +1,29 @@
+:host {
+  display: inline-block;
+}
+
+.link {
+  color: var(--link-color, #005fcc);
+  text-decoration: underline;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.2s ease;
+  transition: transform 0.2s ease;
+}
+
+.link:hover {
+  color: var(--link-hover-color, #003f99);
+  text-decoration-thickness: 2px;
+  transform: scale(1.05);
+}
+
+.link:focus-visible {
+  outline: 3px solid #ffa500;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.link:visited {
+  color: #6b21a8;
+}

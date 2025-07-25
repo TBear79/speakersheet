@@ -14,20 +14,20 @@ const mimeTypeMapping = {
 const basePath = __dirname;
 
 // 1. Serve rendered Handlebars markup
-router.get('/components/molecules/card', (req, res) => {
-  res.render(path.join(basePath, 'card.hbs'), {
+router.get('/components/atoms/image', (req, res) => {
+  res.render(path.join(basePath, 'image.hbs'), {
     layout: false,
     ...req.query
   });
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/molecules/card/:fileExtension(js|css)', (req, res) => {
+router.get('/components/atoms/image/:fileExtension(js|css)', (req, res) => {
   const { fileExtension } = req.params;
-  const fileName = `card.${fileExtension}`
+  const fileName = `image.${fileExtension}`
   const filePath = path.join(basePath, fileName);
 
-  const allowedFiles = ['card.js', 'card.css'];
+  const allowedFiles = ['image.js', 'image.css'];
   if (!allowedFiles.includes(fileName)) {
     return res.status(404).send('Not found');
   }

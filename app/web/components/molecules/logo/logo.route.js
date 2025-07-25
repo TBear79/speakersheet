@@ -7,27 +7,28 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const mimeTypeMapping = {
     js: 'application/javascript',
-    css: 'text/css'
+    css: 'text/css',
+    png: 'image/png'
 };
 
 // Path til denne komponentmappe
 const basePath = __dirname;
 
 // 1. Serve rendered Handlebars markup
-router.get('/components/molecules/card', (req, res) => {
-  res.render(path.join(basePath, 'card.hbs'), {
+router.get('/components/molecules/logo', (req, res) => {
+  res.render(path.join(basePath, 'logo.hbs'), {
     layout: false,
     ...req.query
   });
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/molecules/card/:fileExtension(js|css)', (req, res) => {
+router.get('/components/molecules/logo/:fileExtension(js|css|png)', (req, res) => {
   const { fileExtension } = req.params;
-  const fileName = `card.${fileExtension}`
+  const fileName = `logo.${fileExtension}`
   const filePath = path.join(basePath, fileName);
 
-  const allowedFiles = ['card.js', 'card.css'];
+  const allowedFiles = ['logo.js', 'logo.css', 'logo.png'];
   if (!allowedFiles.includes(fileName)) {
     return res.status(404).send('Not found');
   }
