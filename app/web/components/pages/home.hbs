@@ -2,8 +2,19 @@
 <app-card>
     <span slot="card-header-slot">Fortsæt på eksisterende foredragsholderliste</span>
     <span slot="card-content-slot">
-        Upload den foredragsholderliste du modtog sidst du benyttede app'en her.<br />
-        Træk filen ind i området her, eller klik på knappen her under. 
+        <p>
+            Upload den foredragsholderliste du modtog sidst du benyttede app'en her.
+        </p>
+        <p>
+            Træk filen ind i området her, eller klik på knappen her under. 
+        </p>
+
+        <div class="card-center">
+            <app-link-button variant="primary" href="/new">
+                <span slot="icon">🔧</span>
+                Upload din foredragsholderliste
+            </app-link-button>
+        </div>
     </span>
 </app-card>
 
@@ -14,10 +25,12 @@
         Påbegynd ny foredragsholderliste, men kun hvis du ikke har oprettet en i forvejen.
         </p>
 
-        <app-link-button href="/new">
-            <span slot="icon">📝</span>
-            Opret ny foredragsholderliste
-        </app-link-button>
+        <div class="card-center">
+            <app-link-button href="/new">
+                <span slot="icon">📝</span>
+                Opret ny foredragsholderliste
+            </app-link-button>
+        </div>
     </span>
 </app-card>
 
