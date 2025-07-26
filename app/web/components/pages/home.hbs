@@ -1,20 +1,29 @@
 {{#> layout title='Speakersheet' }}
+
+<script>
+function handleFiles(files) {
+    console.log('Filer droppet:', files);
+  }
+</script>
+
 <app-card>
     <span slot="card-header-slot">Fortsæt på eksisterende foredragsholderliste</span>
     <span slot="card-content-slot">
-        <p>
-            Upload den foredragsholderliste du modtog sidst du benyttede app'en her, for at redigere.
-        </p>
-        <p>
-            Træk filen ind i området her, eller klik på knappen her under. 
-        </p>
+        <app-upload-area onfiledrop="handleFiles">
+            <p>
+                Upload den foredragsholderliste du modtog sidst du benyttede app'en her, for at redigere.
+            </p>
+            <p>
+                Træk filen ind i området her, eller klik på knappen her under. 
+            </p>
 
-        <div class="card-center">
-            <app-button variant="primary" aria-label="Upload din foredragsholderliste" onclick="alert('Uploader...')">
-                <span slot="icon">🔧</span>
-                Upload din foredragsholderliste
-            </app-button>
-        </div>
+            <div class="card-center">
+                <app-button variant="primary" aria-label="Upload din foredragsholderliste" onclick="alert('Uploader...')">
+                    <span slot="icon">🔧</span>
+                    Upload din foredragsholderliste
+                </app-button>
+            </div>
+        </app-upload-area>
     </span>
 </app-card>
 
@@ -33,5 +42,4 @@
         </div>
     </span>
 </app-card>
-
 {{/layout}}

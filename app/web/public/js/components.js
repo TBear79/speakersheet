@@ -5,3 +5,4 @@ import '/components/atoms/link-button/link-button-script';
 import '/components/atoms/logo/logo-script';
 
 import '/components/molecules/card/card-script';
+import '/components/molecules/upload-area/upload-area-script';
