@@ -14,8 +14,8 @@ class AppLinkButton extends BaseComponent {
     const query = new URLSearchParams({ href, target, rel, ariaLabel }).toString();
 
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/link-button?${query}`).then(res => res.text()),
-      fetch('/components/atoms/link-button/styles').then(res => res.text())
+      fetch(`/components/atoms/link-button/link-button-markup?${query}`).then(res => res.text()),
+      fetch('/components/atoms/link-button/link-button-styles').then(res => res.text())
     ]);
 
     this.shadowRoot.innerHTML = `

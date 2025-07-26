@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-router.get('/components/atoms/button', (req, res) => {
+router.get('/components/atoms/button/button-markup', (req, res) => {
   res.render(path.join(__dirname, 'button.hbs'), {
     layout: false,
     ...req.query

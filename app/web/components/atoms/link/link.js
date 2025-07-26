@@ -13,8 +13,8 @@ class AppLink extends BaseComponent {
     const query = new URLSearchParams({ href, target, rel }).toString();
 
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/link?${query}`).then(res => res.text()),
-      fetch('/components/atoms/link/styles').then(res => res.text())
+      fetch(`/components/atoms/link/link-markup?${query}`).then(res => res.text()),
+      fetch('/components/atoms/link/link-styles').then(res => res.text())
     ]);
 
     this.shadowRoot.innerHTML = `

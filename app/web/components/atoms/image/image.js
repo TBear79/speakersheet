@@ -17,8 +17,8 @@ class AppImage extends BaseComponent {
       const query = new URLSearchParams({ src, alt: alt || '' }).toString();
   
       const [html, css] = await Promise.all([
-        fetch(`/components/atoms/image?${query}`).then(res => res.text()),
-        fetch('/components/atoms/image/style').then(res => res.text())
+        fetch(`/components/atoms/image/image-markup?${query}`).then(res => res.text()),
+        fetch('/components/atoms/image/image-style').then(res => res.text())
       ]);
   
       this.shadowRoot.innerHTML = `

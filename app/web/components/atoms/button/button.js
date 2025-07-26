@@ -13,7 +13,7 @@ class AppButton extends BaseComponent {
     const query = new URLSearchParams({ type, ariaLabel, variant }).toString();
 
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/button?${query}`).then(res => res.text()),
+      fetch(`/components/atoms/button/button-markup?${query}`).then(res => res.text()),
       fetch('/components/atoms/button/button-styles').then(res => res.text())
     ]);
 

@@ -14,7 +14,7 @@ const mimeTypeMapping = {
 const basePath = __dirname;
 
 // 1. Serve rendered Handlebars markup
-router.get('/components/molecules/card', (req, res) => {
+router.get('/components/molecules/card/card-markup', (req, res) => {
   res.render(path.join(basePath, 'card.hbs'), {
     layout: false,
     ...req.query
@@ -22,12 +22,12 @@ router.get('/components/molecules/card', (req, res) => {
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/molecules/card/script', (req, res) => {
+router.get('/components/molecules/card/card-script', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, `card.js`));
 });
 
-router.get('/components/molecules/card/styles', (req, res) => {
+router.get('/components/molecules/card/card-styles', (req, res) => {
   res.type('text/css');
   res.sendFile(path.join(__dirname, `card.css`));
 });
