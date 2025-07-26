@@ -1,0 +1,55 @@
+:host {
+  display: inline-block;
+}
+
+/* Base styling */
+app-link::part(button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 1.2em;
+  border-radius: 0.75em;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  background: #e0e0e0;
+  color: #111;
+  box-shadow: 6px 6px 12px #bebebe, -6px -6px 12px #ffffff;
+}
+
+app-link::part(button):hover {
+  background: #d4d4d4;
+}
+
+/* Icon */
+app-link::part(button) .icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Variants */
+:host([variant="primary"]) app-link::part(button) {
+  background: #3b82f6;
+  color: white;
+}
+:host([variant="primary"]) app-link::part(button):hover {
+  background: #2563eb;
+}
+
+:host([variant="warning"]) app-link::part(button) {
+  background: #f97316;
+  color: white;
+}
+:host([variant="warning"]) app-link::part(button):hover {
+  background: #ea580c;
+}
+
+:host([variant="disabled"]) app-link::part(button) {
+  background: #ccc;
+  color: #666;
+  pointer-events: none;
+  cursor: not-allowed;
+  box-shadow: none;
+}
