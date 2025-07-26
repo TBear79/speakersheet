@@ -1,19 +1,8 @@
-class AppImage extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-    }
-  
+import { BaseComponent }  from '/js/BaseComponent.js'
+
+class AppImage extends BaseComponent {
     static get observedAttributes() {
       return ['src', 'alt'];
-    }
-  
-    async connectedCallback() {
-      this.render();
-    }
-  
-    attributeChangedCallback() {
-      this.render();
     }
   
     async render() {
@@ -29,7 +18,7 @@ class AppImage extends HTMLElement {
   
       const [html, css] = await Promise.all([
         fetch(`/components/atoms/image?${query}`).then(res => res.text()),
-        fetch('/components/atoms/image/css').then(res => res.text())
+        fetch('/components/atoms/image/image.css').then(res => res.text())
       ]);
   
       this.shadowRoot.innerHTML = `

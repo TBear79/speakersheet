@@ -1,13 +1,10 @@
-class AppLogo extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-    }
-  
+import { BaseComponent }  from '/js/BaseComponent.js'
+
+class AppLogo extends BaseComponent {
     async connectedCallback() {
       const [html, css] = await Promise.all([
         fetch('/components/molecules/logo').then(res => res.text()),
-        fetch('/components/molecules/logo/css').then(res => res.text())
+        fetch('/components/molecules/logo/logo.css').then(res => res.text())
       ]);
   
       this.shadowRoot.innerHTML = `

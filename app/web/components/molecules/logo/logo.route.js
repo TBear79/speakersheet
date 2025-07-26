@@ -5,36 +5,28 @@ import { fileURLToPath } from 'url';
 const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const mimeTypeMapping = {
-    js: 'application/javascript',
-    css: 'text/css',
-    png: 'image/png'
-};
-
-// Path til denne komponentmappe
-const basePath = __dirname;
-
 // 1. Serve rendered Handlebars markup
 router.get('/components/molecules/logo', (req, res) => {
-  res.render(path.join(basePath, 'logo.hbs'), {
+  res.render(path.join(__dirname, 'logo.hbs'), {
     layout: false,
     ...req.query
   });
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/molecules/logo/:fileExtension(js|css|png)', (req, res) => {
-  const { fileExtension } = req.params;
-  const fileName = `logo.${fileExtension}`
-  const filePath = path.join(basePath, fileName);
+router.get('/components/molecules/logo/logo.js', (req, res) => {
+  res.type('application/javascript');
+  res.sendFile(path.join(__dirname, `logo.js`));
+});
 
-  const allowedFiles = ['logo.js', 'logo.css', 'logo.png'];
-  if (!allowedFiles.includes(fileName)) {
-    return res.status(404).send('Not found');
-  }
+router.get('/components/molecules/logo/logo.css', (req, res) => {
+  res.type('text/css');
+  res.sendFile(path.join(__dirname, `logo.css`));
+});
 
-  res.type(mimeTypeMapping[fileExtension]);
-  res.sendFile(filePath);
+router.get('/components/molecules/logo/logo.png', (req, res) => {
+  res.type('image/png');
+  res.sendFile(path.join(__dirname, `logo.png`));
 });
 
 export default router;
