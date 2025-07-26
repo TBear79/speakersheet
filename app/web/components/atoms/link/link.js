@@ -14,7 +14,7 @@ class AppLink extends BaseComponent {
 
     const [html, css] = await Promise.all([
       fetch(`/components/atoms/link?${query}`).then(res => res.text()),
-      fetch('/components/atoms/link/link.css').then(res => res.text())
+      fetch('/components/atoms/link/styles').then(res => res.text())
     ]);
 
     this.shadowRoot.innerHTML = `

@@ -4,7 +4,7 @@ class AppLogo extends BaseComponent {
     async connectedCallback() {
       const [html, css] = await Promise.all([
         fetch('/components/molecules/logo').then(res => res.text()),
-        fetch('/components/molecules/logo/logo.css').then(res => res.text())
+        fetch('/components/molecules/logo/styles').then(res => res.text())
       ]);
   
       this.shadowRoot.innerHTML = `

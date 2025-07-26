@@ -18,7 +18,7 @@ class AppImage extends BaseComponent {
   
       const [html, css] = await Promise.all([
         fetch(`/components/atoms/image?${query}`).then(res => res.text()),
-        fetch('/components/atoms/image/image.css').then(res => res.text())
+        fetch('/components/atoms/image/style').then(res => res.text())
       ]);
   
       this.shadowRoot.innerHTML = `

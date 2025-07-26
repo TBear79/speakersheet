@@ -1,5 +1,5 @@
-import '/components/atoms/image/image.js';
-import '/components/atoms/link/link.js';
+import '/components/atoms/image/script';
+import '/components/atoms/link/script';
 
-import '/components/molecules/card/card.js';
-import '/components/molecules/logo/logo.js';
+import '/components/molecules/card/script';
+import '/components/molecules/logo/script';

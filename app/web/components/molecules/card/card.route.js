@@ -22,12 +22,12 @@ router.get('/components/molecules/card', (req, res) => {
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/molecules/card/card.js', (req, res) => {
+router.get('/components/molecules/card/script', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, `card.js`));
 });
 
-router.get('/components/molecules/card/card.css', (req, res) => {
+router.get('/components/molecules/card/styles', (req, res) => {
   res.type('text/css');
   res.sendFile(path.join(__dirname, `card.css`));
 });

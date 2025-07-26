@@ -14,17 +14,17 @@ router.get('/components/molecules/logo', (req, res) => {
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/molecules/logo/logo.js', (req, res) => {
+router.get('/components/molecules/logo/script', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, `logo.js`));
 });
 
-router.get('/components/molecules/logo/logo.css', (req, res) => {
+router.get('/components/molecules/logo/styles', (req, res) => {
   res.type('text/css');
   res.sendFile(path.join(__dirname, `logo.css`));
 });
 
-router.get('/components/molecules/logo/logo.png', (req, res) => {
+router.get('/components/molecules/logo/image', (req, res) => {
   res.type('image/png');
   res.sendFile(path.join(__dirname, `logo.png`));
 });

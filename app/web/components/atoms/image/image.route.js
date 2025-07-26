@@ -14,12 +14,12 @@ router.get('/components/atoms/image', (req, res) => {
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/atoms/image/image.js', (req, res) => {
+router.get('/components/atoms/image/script', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, `image.js`));
 });
 
-router.get('/components/atoms/image/image.css', (req, res) => {
+router.get('/components/atoms/image/style', (req, res) => {
   res.type('text/css');
   res.sendFile(path.join(__dirname, `image.css`));
 });
