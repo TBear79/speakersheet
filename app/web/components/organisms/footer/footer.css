@@ -1,0 +1,9 @@
+footer {
+  background: white;
+  color: black;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+}
+
+.copyright {
+  font-size: smaller;
+}
