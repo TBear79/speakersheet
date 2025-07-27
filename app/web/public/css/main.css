@@ -9,10 +9,6 @@
   box-sizing: border-box;
 }
 
-header  h1{
-  margin: auto 1rem auto 10px;
-}
-
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
@@ -40,7 +36,6 @@ body {
   }
 }
 
-.site-header,
 .site-footer {
   background: white;
   color: black;
