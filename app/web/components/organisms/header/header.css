@@ -1,6 +1,7 @@
 header {
   background: white;
   color: black;
+  border-bottom: 1px solid black;
   padding: 1rem 0 0 1rem;
 }
 

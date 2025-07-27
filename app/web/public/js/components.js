@@ -7,4 +7,5 @@ import '/components/atoms/logo/logo-script';
 import '/components/molecules/card/card-script';
 import '/components/molecules/upload-area/upload-area-script';
 
+import '/components/organisms/footer/footer-script';
 import '/components/organisms/header/header-script';

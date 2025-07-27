@@ -21,7 +21,6 @@ body {
   min-height: 100svh;
 }
 
-/* Fælles stil for indholdet i header, main og footer */
 .content {
   max-width: var(--content-max-width);
   margin-inline: auto;
@@ -36,13 +35,7 @@ body {
   }
 }
 
-.site-footer {
-  background: white;
-  color: black;
-}
-
 .site-main {
-  border-top: 1px solid black;
   background:gainsboro;
   color: #111;
 }
