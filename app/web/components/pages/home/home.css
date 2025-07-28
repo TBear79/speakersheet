@@ -1,0 +1,10 @@
+.card-center {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .card-center > app-link-button {
+    display: inline-block;
+  }
+  

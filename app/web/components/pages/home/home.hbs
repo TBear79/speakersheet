@@ -1,0 +1,36 @@
+<app-card>
+  <span slot="card-header-slot">Fortsæt på eksisterende foredragsholderliste</span>
+  <span slot="card-content-slot">
+    <app-upload-area name="upload-existing" onfiledrop="handleFiles">
+      <p>
+        Upload den foredragsholderliste du modtog sidst du benyttede app'en her, for at redigere.
+      </p>
+      <p>
+        Træk filen ind i området her, eller klik på knappen her under. 
+      </p>
+
+      <div class="card-center">
+        <app-button variant="primary" aria-label="Upload din foredragsholderliste" onclick="alert('Uploader...')">
+          <span slot="icon">🔧</span>
+          Upload din foredragsholderliste
+        </app-button>
+      </div>
+    </app-upload-area>
+  </span>
+</app-card>
+
+<app-card>
+  <span slot="card-header-slot">Start på nyt program</span>
+  <span slot="card-content-slot">
+    <p>
+      Påbegynd ny foredragsholderliste, men kun hvis du ikke har oprettet en i forvejen.
+    </p>
+
+    <div class="card-center">
+      <app-link-button href="/new" spa>
+        <span slot="icon">📝</span>
+        Opret ny foredragsholderliste
+      </app-link-button>
+    </div>
+  </span>
+</app-card>

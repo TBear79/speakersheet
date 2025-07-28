@@ -40,12 +40,12 @@ body {
   color: #111;
 }
 
-.card-center {
-  display: block;
-  width: 100%;
-  text-align: center;
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-.card-center > app-link-button {
-  display: inline-block;
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
