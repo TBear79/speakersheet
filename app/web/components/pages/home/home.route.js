@@ -10,10 +10,7 @@ const basePath = __dirname;
 
 // 1. Serve rendered Handlebars markup
 router.get('/components/pages/home/home-markup', (req, res) => {
-  res.render(path.join(basePath, 'home.hbs'), {
-    layout: false,
-    ...req.query
-  });
+    res.render(path.join(basePath, 'home.hbs'), { layout: false, ...req.query });
 });
 
 // 2. Serve JS og CSS som statiske filer

@@ -8,7 +8,7 @@ const router = express.Router();
 
 const componentsRoot = path.join(__dirname, '../components');
 
-const atomicGroups = ['atoms', 'molecules', 'organisms', 'pages'];
+const atomicGroups = ['atoms', 'molecules', 'organisms', 'pages', 'hooks'];
 
 for (const group of atomicGroups) {
   const groupPath = path.join(componentsRoot, group);
@@ -26,8 +26,21 @@ for (const group of atomicGroups) {
 }
 
 router.get('/', (req, res) => {
-  res.render('home', { title: 'SpeakerSheet' });
+  const isSpa = req.headers['x-spa-request'] === 'true';
+  res.render('home', { 
+    title: 'SpeakerSheet',
+    layout: isSpa ? false : 'main'
+  });
 });
+
+router.get('/new', (req, res) => {
+  const isSpa = req.headers['x-spa-request'] === 'true';
+  res.render('new', { 
+    title: 'SpeakerSheet',
+    layout: isSpa ? false : 'main'
+  });
+});
+
 
 router.post('/upload', (req, res) => {
   // parse uploaded PDF with pdf-lib

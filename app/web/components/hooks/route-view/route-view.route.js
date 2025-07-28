@@ -10,4 +10,9 @@ router.get('/components/hooks/route-view/route-view-script', (req, res) => {
   res.sendFile(path.join(__dirname, `route-view.js`));
 });
 
+router.get('/components/hooks/route-view/route-view-styles', (req, res) => {
+  res.type('text/css');
+  res.sendFile(path.join(__dirname, 'route-view.css'));
+});
+
 export default router;
