@@ -2,7 +2,7 @@ import { BaseComponent }  from '/js/BaseComponent.js'
 
 class AppLinkButton extends BaseComponent {
   static get observedAttributes() {
-    return ['href', 'target', 'rel', 'aria-label'];
+    return ['href', 'target', 'rel', 'aria-label', 'spa'];
   }
 
   async render() {
@@ -10,8 +10,9 @@ class AppLinkButton extends BaseComponent {
     const target = this.getAttribute('target') || '_self';
     const rel = this.getAttribute('rel') || (target === '_blank' ? 'noopener noreferrer' : '');
     const ariaLabel = this.getAttribute('aria-label') || '';
+    const isSpa = this.hasAttribute('spa');
 
-    const query = new URLSearchParams({ href, target, rel, ariaLabel }).toString();
+    const query = new URLSearchParams({ href, target, rel, ariaLabel, isSpa }).toString();
 
     const [html, css] = await Promise.all([
       fetch(`/components/atoms/link-button/link-button-markup?${query}`).then(res => res.text()),

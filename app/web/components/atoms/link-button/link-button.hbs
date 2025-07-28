@@ -4,6 +4,7 @@
   target="{{target}}"
   rel="{{rel}}"
   aria-label="{{ariaLabel}}"
+  {{#if isSpa}}spa{{/if}}
 >
   <span class="icon"><slot name="icon"></slot></span>
   <span class="text"><slot></slot></span>
