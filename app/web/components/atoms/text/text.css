@@ -1,0 +1,20 @@
+.app-text-input {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: #e0e0e0;
+    box-shadow:
+      inset 4px 4px 8px #bebebe,
+      inset -4px -4px 8px #ffffff;
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .app-text-input:focus {
+    outline: none;
+    box-shadow:
+      inset 2px 2px 4px #bebebe,
+      inset -2px -2px 4px #ffffff;
+  }
+  
