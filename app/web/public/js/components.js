@@ -13,4 +13,4 @@ import '/components/organisms/footer/footer-script';
 import '/components/organisms/header/header-script';
 
 import '/components/pages/home/home-script';
-import '/components/pages/new/new-script';
+import '/components/pages/view-speakersheet/view-speakersheet-script';

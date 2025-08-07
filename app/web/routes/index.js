@@ -33,10 +33,10 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/new', (req, res) => {
+router.get('/create-speakersheet', (req, res) => {
   const isSpa = req.headers['x-spa-request'] === 'true';
-  res.render('new', { 
-    title: 'SpeakerSheet',
+  res.render('view-speakersheet', { 
+    title: 'Opret ny foredragsholderliste',
     layout: isSpa ? false : 'main'
   });
 });

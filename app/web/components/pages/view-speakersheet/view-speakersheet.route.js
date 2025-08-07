@@ -9,22 +9,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const basePath = __dirname;
 
 // 1. Serve rendered Handlebars markup
-router.get('/components/pages/new/new-markup', (req, res) => {
-  res.render(path.join(basePath, 'new.hbs'), {
+router.get('/components/pages/view-speakersheet/view-speakersheet-markup', (req, res) => {
+  res.render(path.join(basePath, 'view-speakersheet.hbs'), {
     layout: false,
     ...req.query
   });
 });
 
 // 2. Serve JS og CSS som statiske filer
-router.get('/components/pages/new/new-script', (req, res) => {
+router.get('/components/pages/view-speakersheet/view-speakersheet-script', (req, res) => {
   res.type('application/javascript');
-  res.sendFile(path.join(__dirname, `new.js`));
+  res.sendFile(path.join(__dirname, `view-speakersheet.js`));
 });
 
-router.get('/components/pages/new/new-styles', (req, res) => {
+router.get('/components/pages/view-speakersheet/view-speakersheet-styles', (req, res) => {
   res.type('text/css');
-  res.sendFile(path.join(__dirname, `new.css`));
+  res.sendFile(path.join(__dirname, `view-speakersheet.css`));
 });
 
 export default router;

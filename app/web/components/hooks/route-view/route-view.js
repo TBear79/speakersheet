@@ -38,6 +38,8 @@ class AppRouteView extends BaseComponent {
   async loadRoute(href) {
     const loadId = ++this.currentLoadId;
 
+    if (loadId !== this.currentLoadId) return; // Nyere navigation påbegyndt
+
     // Fade ud
     this.classList.add('fade-out');
     await new Promise(r => setTimeout(r, 200));
@@ -48,8 +50,6 @@ class AppRouteView extends BaseComponent {
       });
 
       const html = await res.text();
-
-      if (loadId !== this.currentLoadId) return; // Nyere navigation påbegyndt
 
       if (html.includes('<!DOCTYPE html>')) {
         console.error('FEJL: app-route-view modtog hele dokumentet. Sørg for layout: false på serveren.');
@@ -67,6 +67,7 @@ class AppRouteView extends BaseComponent {
       this.appendChild(wrapper);
 
       this.dispatchEvent(new CustomEvent('spa-page-loaded', { bubbles: true }));
+
     } catch (err) {
       if (loadId === this.currentLoadId) {
         this.innerHTML = `<p style="color:red;">Der opstod en fejl under indlæsning af siden.</p>`;
