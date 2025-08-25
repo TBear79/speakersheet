@@ -1,9 +1,13 @@
 import { PDFDocument } from 'pdf-lib';
 import fs from 'fs/promises';
 
-export async function readPdf(filePath) {
+export async function readPdfJsonFromFile(filePath) {
     const fileBuffer = await fs.readFile(filePath);
-    const pdfDoc = await PDFDocument.load(fileBuffer);
+    return readPdfJson(fileBuffer);
+}
+
+export async function readPdfJson(pdfBytes) {
+    const pdfDoc = await PDFDocument.load(pdfBytes);
     const form = pdfDoc.getForm();
 
     const metaField = form.getTextField('_meta');
