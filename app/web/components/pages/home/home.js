@@ -5,9 +5,13 @@ class AppHome extends BaseComponent {
     return [];
   }
 
+  #onNewPdfLinkClickEventName = 'home:newpdflink:click';
+
   async render() {
+    const query = new URLSearchParams({ onNewPdfLinkClickEventName: this.#onNewPdfLinkClickEventName }).toString();
+
     const [html, css] = await Promise.all([
-      fetch('/components/pages/home/home-markup').then(res => res.text()),
+      fetch(`/components/pages/home/home-markup?${query}`).then(res => res.text()),
       fetch('/components/pages/home/home-styles').then(res => res.text()).catch(() => '')
     ]);
 
@@ -26,6 +30,13 @@ class AppHome extends BaseComponent {
         this.#handleFiles(e.detail.files);
       });
     }
+
+    this.addEventListener(this.#onNewPdfLinkClickEventName, e => {
+      this.dispatchNamedEvent(
+        this.closest('app-route-view')?.getAttribute('eventget'),
+        { ...e.detail }
+      );
+    });
   }
 
   #handleFiles(files) {

@@ -21,13 +21,40 @@ export class BaseComponent extends HTMLElement {
         this.#renderScheduled = true;
         queueMicrotask(() => {
           this.#renderScheduled = false;
-          this.render(); // Din komponent skal definere en `render()` metode
+          this.render();
         });
       }
     }
   
-    // Undgå at nogen glemmer at overskrive `render`
     render() {
       console.warn('BaseComponent.render() was called, but not implemented.');
+    }
+
+    dispatchNamedEvent(eventName, detail = {}, opts = {}) {
+      this.#validateEventName(eventName);
+
+      this.dispatchEvent(new CustomEvent(eventName, {
+        detail,
+        bubbles: opts.bubbles ?? true,
+        composed: opts.composed ?? true
+      }));
+
+      return eventName;
+    }
+
+    #validateEventName(eventName) {
+      if (typeof eventName !== 'string') {
+        throw new Error(`Event name must be a string, got ${typeof eventName}`);
+      }
+  
+      const regex = /^[a-z0-9]+:[a-z0-9]+:[a-z0-9]+$/;
+  
+      if (!regex.test(eventName)) {
+        throw new Error(
+          `Invalid event name "${eventName}". Must match format "part:part:part" (lowercase letters/numbers only). Example: "link:newpdf:click".`
+        );
+      }
+  
+      return true;
     }
   }

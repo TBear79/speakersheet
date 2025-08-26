@@ -2,15 +2,15 @@ import { BaseComponent }  from '/js/BaseComponent.js'
 
 class AppLink extends BaseComponent {
   static get observedAttributes() {
-    return ['href', 'target', 'rel', 'spa'];
+    return ['href', 'target', 'rel'];
   }
 
   async render() {
     const href = this.getAttribute('href') || '#';
     const target = this.getAttribute('target') || '_self';
     const rel = this.getAttribute('rel') || (target === '_blank' ? 'noopener noreferrer' : '');
-
-    const query = new URLSearchParams({ href, target, rel }).toString();
+    const onClickEventName = this.getAttribute('onclickeventname') || '';
+    const query = new URLSearchParams({ href, target, rel, onClickEventName }).toString();
 
     const [html, css] = await Promise.all([
       fetch(`/components/atoms/link/link-markup?${query}`).then(res => res.text()),
@@ -22,10 +22,7 @@ class AppLink extends BaseComponent {
       ${html}
     `;
 
-    if(this.hasAttribute('spa'))
-    {
-      this.addClickHandler();
-    }
+    this.addClickHandler();
   }
 
   addClickHandler() {
@@ -33,16 +30,18 @@ class AppLink extends BaseComponent {
     if (!anchor) return;
 
     anchor.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      const isSpa = this.hasAttribute('spa');
+
+      if(isSpa) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
 
       const href = this.getAttribute('href');
-      if (href) {
-        window.dispatchEvent(
-          new CustomEvent('spa-url-change', {
-            detail: { href }
-          })
-        );
+      const onClickEventName = this.getAttribute('onclickeventname');
+      
+      if (href && onClickEventName) {
+        this.dispatchNamedEvent(onClickEventName, { isSpa, href });
       }
     });
   }
