@@ -6,9 +6,10 @@ class AppHome extends BaseComponent {
   }
 
   #onNewPdfLinkClickEventName = 'home:newpdflink:click';
+  #onUploadAreaFileDropEventName = 'home:pdffile:drop';
 
   async render() {
-    const query = new URLSearchParams({ onNewPdfLinkClickEventName: this.#onNewPdfLinkClickEventName }).toString();
+    const query = new URLSearchParams({ onNewPdfLinkClickEventName: this.#onNewPdfLinkClickEventName, onUploadAreaFileDropEventName: this.#onUploadAreaFileDropEventName  }).toString();
 
     const [html, css] = await Promise.all([
       fetch(`/components/pages/home/home-markup?${query}`).then(res => res.text()),
@@ -24,12 +25,20 @@ class AppHome extends BaseComponent {
   }
 
   #bindEvents() {
-    const uploadArea = this.shadowRoot.querySelector('app-upload-area');
-    if (uploadArea) {
-      uploadArea.addEventListener('upload-existing-filedrop', (e) => {
-        this.#handleFiles(e.detail.files);
-      });
-    }
+    this.addEventListener(this.#onUploadAreaFileDropEventName, e => {
+      const file = e.detail?.files?.[0];
+      if (!file) return;
+
+      this.dispatchNamedEvent(
+        this.closest('app-route-view')?.getAttribute('eventpost'),
+        {
+          href: '/edit-speakersheet',
+          isSpa: true,
+          body: file,
+          headers: { 'Content-Type': file.type || 'application/pdf' }
+        }
+      );
+    });
 
     this.addEventListener(this.#onNewPdfLinkClickEventName, e => {
       this.dispatchNamedEvent(

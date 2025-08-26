@@ -67,9 +67,18 @@ class AppUploadArea extends BaseComponent {
     this.#dragCounter = 0;
     this.#setDragOver(false);
 
+    const onFileDropEventName = this.getAttribute('onfiledropeventname');
+
+    if(!onFileDropEventName)
+    {
+      console.error('onfiledropeventname is missing in attributes');
+      return;
+    }
+
     const files = event.dataTransfer?.files;
+
     if (files && files.length > 0) {
-      this.#handleFiles(files);
+      this.dispatchNamedEvent(onFileDropEventName, { files });
     }
   };
 

@@ -1,7 +1,7 @@
 <app-card>
   <span slot="card-header-slot">Fortsæt på eksisterende foredragsholderliste</span>
   <span slot="card-content-slot">
-    <app-upload-area name="upload-existing" onfiledrop="handleFiles">
+    <app-upload-area name="upload-existing" onfiledrop="handleFiles" onfiledropeventname="{{onUploadAreaFileDropEventName}}">
       <p>
         Upload den foredragsholderliste du modtog sidst du benyttede app'en her, for at redigere.
       </p>
