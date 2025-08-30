@@ -9,21 +9,18 @@ class AppViewSpeakersheet extends BaseComponent {
       fetch('/components/pages/view-speakersheet/view-speakersheet-styles').then(res => res.text()).catch(() => '')
     ]);
 
-    // 1) Indsæt DOM først
     this.shadowRoot.innerHTML = `
       <style>${css}</style>
       ${html}
     `;
 
-    // 2) Gem evt. initial data i sessionStorage
     this.#saveInitialLoadToSessionStorage();
 
-    // 3) Og SÅ populate kortene (nu findes noderne)
     this.#setHtmlFromSessionStorage();
   }
 
   // --------- Helpers / utils ---------
-  #jaNej = v => (v ? 'Ja' : 'Nej');
+  #yesNo = v => (v ? 'Ja' : 'Nej');
 
   #formatPhone(phone) {
     if (!phone) return '';
@@ -100,8 +97,9 @@ class AppViewSpeakersheet extends BaseComponent {
     };
 
     this.setBindings(node, data);
+
     // Fjern tomme "data-if" rækker
-    this.#pruneEmptyIfRows(node, data);
+    this.pruneIf(node, data);
 
     host.appendChild(node);
   }
@@ -118,7 +116,7 @@ class AppViewSpeakersheet extends BaseComponent {
     };
 
     this.setBindings(node, data);
-    this.#pruneEmptyIfRows(node, data);
+    this.pruneIf(node, data);
 
     host.appendChild(node);
   }
@@ -151,13 +149,13 @@ class AppViewSpeakersheet extends BaseComponent {
     const data = {
       ...speaker,
       phoneText: this.#formatPhone(speaker.phone),
-      funeralTalkText: this.#jaNej(!!speaker.funeralTalk),
-      weddingTalkText: this.#jaNej(!!speaker.weddingTalk),
-      memorialTalkText: this.#jaNej(!!speaker.memorialTalk)
+      funeralTalkText: this.#yesNo(!!speaker.funeralTalk),
+      weddingTalkText: this.#yesNo(!!speaker.weddingTalk),
+      memorialTalkText: this.#yesNo(!!speaker.memorialTalk)
     };
 
     this.setBindings(node, data);
-    this.#pruneEmptyIfRows(node, data);
+    this.pruneIf(node, data);
 
     // Talks
     const talksFrag = this.#renderTalks(this.#safeArray(speaker.talks));
@@ -197,18 +195,6 @@ class AppViewSpeakersheet extends BaseComponent {
       });
 
     return frag;
-  }
-
-  #pruneEmptyIfRows(root, data) {
-    // Fjerner elementer med [data-if="path"] når path er tom/undefined
-    // vi vil gerne kunne søge i fragmentet
-    this.$all('[data-if]', root).forEach(el => {
-      const path = el.getAttribute('data-if');
-      const v = path ? path.split('.').reduce((o, k) => (o?.[k]), data) : undefined;
-      if (v == null || v === '' || (Array.isArray(v) && v.length === 0)) {
-        el.remove();
-      }
-    });
   }
 }
 
