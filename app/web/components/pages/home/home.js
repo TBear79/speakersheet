@@ -47,10 +47,6 @@ class AppHome extends BaseComponent {
       );
     });
   }
-
-  #handleFiles(files) {
-    console.log('Filer droppet:', files);
-  }
 }
 
 customElements.define('app-home', AppHome);

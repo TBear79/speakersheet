@@ -3,9 +3,24 @@ import { BaseComponent } from '/js/BaseComponent.js';
 class AppViewSpeakersheet extends BaseComponent {
   static get observedAttributes() { return []; }
 
+  #onCongregationEditClick = 'viewspeakersheet:congregationedit:click';
+  #onElderCoordinatorEditClick = 'viewspeakersheet:eldercoordinatoredit:click';
+  #onTalkCoordinatorEditClick = 'viewspeakersheet:talkcoordinatoredit:click';
+  #onSpeakerAddClick = 'viewspeakersheet:speakeradd:click'
+  #onSpeakerEditClick = 'viewspeakersheet:speakeredit:click';
+
   async render() {
+    const query = new URLSearchParams({ 
+      onCongregationEditClick: this.#onCongregationEditClick, 
+      onElderCoordinatorEditClick: this.#onElderCoordinatorEditClick, 
+      onTalkCoordinatorEditClick: this.#onTalkCoordinatorEditClick,
+      onSpeakerAddClick: this.#onSpeakerAddClick,
+      onSpeakerEditClick: this.#onSpeakerEditClick
+      
+    }).toString();
+
     const [html, css] = await Promise.all([
-      fetch('/components/pages/view-speakersheet/view-speakersheet-markup').then(res => res.text()),
+      fetch(`/components/pages/view-speakersheet/view-speakersheet-markup?${query}`).then(res => res.text()),
       fetch('/components/pages/view-speakersheet/view-speakersheet-styles').then(res => res.text()).catch(() => '')
     ]);
 
@@ -17,6 +32,8 @@ class AppViewSpeakersheet extends BaseComponent {
     this.#saveInitialLoadToSessionStorage();
 
     this.#setHtmlFromSessionStorage();
+
+    this.#bindEvents();
   }
 
   // --------- Helpers / utils ---------
@@ -132,13 +149,15 @@ class AppViewSpeakersheet extends BaseComponent {
 
     sorted.forEach((s, index) => {
       const node = this.#renderSpeaker(s);
+
       if (index === 0) {
         host.appendChild(node);
-      } else {
-        const wrap = document.createElement('app-card-section');
-        wrap.appendChild(node);
-        host.appendChild(wrap);
-      }
+        return;
+      } 
+      
+      const wrap = document.createElement('app-card-section');
+      wrap.appendChild(node);
+      host.appendChild(wrap);
     });
   }
 
@@ -173,7 +192,9 @@ class AppViewSpeakersheet extends BaseComponent {
     // Grupér pr. sprog
     const byLang = talks.reduce((m, t) => {
       const lang = t?.language;
+
       if (!lang) return m;
+      
       (m[lang] ||= []).push(t?.talkNumber);
       return m;
     }, {});
@@ -194,6 +215,55 @@ class AppViewSpeakersheet extends BaseComponent {
       });
 
     return frag;
+  }
+
+  // --------- Bind events ---------
+
+  #bindEvents() {
+    this.#bindCongregationEdit();
+    this.#bindElderCoordinatorEdit();
+    this.#bindTalkCoordinatorEdit();
+    this.#bindSpeakerCoordinatorAdd();
+    this.#bindSpeakerCoordinatorEdit();
+  }
+
+  #bindCongregationEdit() {
+    this.addEventListener(this.#onCongregationEditClick, e => {
+      console.log('[congragationEdit]', e);
+    });
+  }
+
+  #bindElderCoordinatorEdit() {
+    this.addEventListener(this.#onElderCoordinatorEditClick, e => {
+      console.log('[elderCoordinatorEdit]', e);
+    });
+  }
+
+  #bindTalkCoordinatorEdit() {
+    this.addEventListener(this.#onTalkCoordinatorEditClick, e => {
+      console.log('[talkCoordinatorEdit]', e);
+    });
+  }
+
+  #bindSpeakerCoordinatorAdd() {
+    this.addEventListener(this.#onSpeakerAddClick, e => {
+      console.log('[speakerCoordinatorAdd]', e);
+    });
+  }
+
+  #bindSpeakerCoordinatorEdit() {
+    this.addEventListener(this.#onSpeakerEditClick, e => {
+      const id = e.composedPath()
+        .find(n => n instanceof Element && n.hasAttribute?.('data-speaker-id'))
+        ?.getAttribute('data-speaker-id');
+
+      if (!id) {
+        console.warn('[speakerCoordinatorEdit] no speaker-id found', e);
+        return;
+      }
+
+      console.log('[speakerCoordinatorEdit]', id, e.composedPath());
+    });
   }
 }
 

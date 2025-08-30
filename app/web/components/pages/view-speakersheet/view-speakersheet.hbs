@@ -5,7 +5,7 @@
       Information om menigheden er ikke udfyldt endnu
     </span>
     <div class="card-footer">
-      <app-button class="congregation-button">
+      <app-button class="congregation-button" variant="primary" onclickeventname="{{onCongregationEditClick}}">
         <span>Redigér</span>
       </app-button>
     </div>
@@ -19,7 +19,7 @@
       Information om koordinator for ældsterådet er ikke udfyldt endnu
     </span>
     <div class="card-footer">
-      <app-button class="congregation-button">
+      <app-button class="congregation-button" variant="primary" onclickeventname="{{onElderCoordinatorEditClick}}">
         <span>Redigér</span>
       </app-button>
     </div>
@@ -33,7 +33,7 @@
       Information om foredragskoordinator er ikke udfyldt endnu
     </span>
     <div class="card-footer">
-      <app-button class="congregation-button">
+      <app-button class="congregation-button" variant="primary" onclickeventname="{{onTalkCoordinatorEditClick}}">
         <span>Redigér</span>
       </app-button>
     </div>
@@ -46,6 +46,11 @@
     <span class="replace-content">
       Der er ikke tilføjet nogen foredragsholdere endnu
     </span>
+    <div class="card-footer">
+      <app-button class="congregation-button" variant="primary" onclickeventname="{{onSpeakerAddClick}}">
+        <span>Tilføj</span>
+      </app-button>
+    </div>
   </span>
 </app-card>
 
@@ -71,18 +76,25 @@
 </template>
 
 <template id="tpl-speaker">
-  <h3 data-bind="name"></h3>
-  <div class="display-rows">
-    <div class="row"><span class="label">Telefonnr.:</span><span class="value" data-bind="phoneText"></span></div>
-    <div class="row" data-if="email"><span class="label">Email:</span><span class="value" data-bind="email"></span></div>
-    <div class="row"><span class="label">Begravelsesforedrag:</span><span class="value" data-bind="funeralTalkText"></span></div>
-    <div class="row"><span class="label">Bryllupsforedrag:</span><span class="value" data-bind="weddingTalkText"></span></div>
-    <div class="row"><span class="label">Mindehøjtidsforedrag:</span><span class="value" data-bind="memorialTalkText"></span></div>
-    <div class="talks">
-      <h4>Foredrag:</h4>
-      <div data-slot="talks"></div>
+  <span data-bind-attr="data-speaker-id:id">
+    <h3 data-bind="name"></h3>
+    <div class="display-rows">
+      <div class="row"><span class="label">Telefonnr.:</span><span class="value" data-bind="phoneText"></span></div>
+      <div class="row" data-if="email"><span class="label">Email:</span><span class="value" data-bind="email"></span></div>
+      <div class="row"><span class="label">Begravelsesforedrag:</span><span class="value" data-bind="funeralTalkText"></span></div>
+      <div class="row"><span class="label">Bryllupsforedrag:</span><span class="value" data-bind="weddingTalkText"></span></div>
+      <div class="row"><span class="label">Mindehøjtidsforedrag:</span><span class="value" data-bind="memorialTalkText"></span></div>
+      <div class="talks">
+        <h4>Foredrag:</h4>
+        <div data-slot="talks"></div>
+      </div>
     </div>
-  </div>
+    <div class="card-footer">
+        <app-button class="congregation-button" variant="primary" onclickeventname="{{onSpeakerEditClick}}">
+          <span>Redigér</span>
+        </app-button>
+      </div>
+    </span>
 </template>
 
 <template id="tpl-talkline">
