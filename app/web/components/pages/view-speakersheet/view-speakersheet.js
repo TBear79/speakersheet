@@ -98,7 +98,6 @@ class AppViewSpeakersheet extends BaseComponent {
 
     this.setBindings(node, data);
 
-    // Fjern tomme "data-if" rækker
     this.pruneIf(node, data);
 
     host.appendChild(node);

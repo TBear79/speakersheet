@@ -59,7 +59,6 @@ export class BaseComponent extends HTMLElement {
   }
 
   // ---------- DOM helpers ----------
-  $(sel, root = this.shadowRoot) { return root?.querySelector(sel) ?? null; }
   $all(sel, root = this.shadowRoot) { return root ? Array.from(root.querySelectorAll(sel)) : []; }
 
   cloneTpl(id, root = this.shadowRoot) {
@@ -70,30 +69,25 @@ export class BaseComponent extends HTMLElement {
 
   setBindings(root, data) {
     this.$all('[data-bind]', root).forEach(el => {
-      const path = el.getAttribute('data-bind');
-      el.textContent = this.#get(data, path) ?? '';
+      const key = el.getAttribute('data-bind');
+      el.textContent = data?.[key] ?? '';
     });
-
-    // Valgfrit: bind attributes via "attr:path, attr2:path2"
+  
     this.$all('[data-bind-attr]', root).forEach(el => {
       const spec = el.getAttribute('data-bind-attr') || '';
-
       spec.split(',').map(s => s.trim()).filter(Boolean).forEach(pair => {
-        const [attr, path] = pair.split(':').map(s => s.trim());
-        const v = this.#get(data, path);
-      
+        const [attr, key] = pair.split(':').map(s => s.trim());
+        const v = data?.[key];
         if (v == null || v === '') el.removeAttribute(attr);
         else el.setAttribute(attr, String(v));
       });
     });
-
-    // Valgfrit: rå HTML (brug kun på trusted/sanitized data)
+  
     this.$all('[data-bind-html]', root).forEach(el => {
-      const path = el.getAttribute('data-bind-html');
-      const v = this.#get(data, path);
-      el.innerHTML = v ?? '';
+      const key = el.getAttribute('data-bind-html');
+      el.innerHTML = data?.[key] ?? '';
     });
-
+  
     return root;
   }
 
@@ -103,42 +97,31 @@ export class BaseComponent extends HTMLElement {
     return root;
   }
 
-  #get(obj, path) {
-    if (!path) return undefined;
-    return path.split('.').reduce((o, k) => (o?.[k]), obj);
-  }
-
   // ---------------- Conditional rendering helpers ----------------
-pruneIf(root, data) {
-  // Fjern elementer hvor data-if peger på en "tom" værdi
-  this.$all('[data-if]', root).forEach(el => {
-    const path = el.getAttribute('data-if');
-    const v = this.#valueAtPath(data, path);
-    if (this.#isEmptyForIf(v)) el.remove();
-  });
-
-  // Fjern elementer hvor data-unless peger på en "ikke-tom" værdi
-  this.$all('[data-unless]', root).forEach(el => {
-    const path = el.getAttribute('data-unless');
-    const v = this.#valueAtPath(data, path);
-    if (!this.#isEmptyForIf(v)) el.remove();
-  });
-
-  return root;
-}
-
-// --- private helpers ---
-#valueAtPath(obj, path) {
-  if (!path) return undefined;
-  return path.split('.').reduce((o, k) => (o?.[k]), obj);
-}
-
-// "Tom" betyder: null/undefined, '', whitespace-only string, [], false
-#isEmptyForIf(v) {
-  if (v == null) return true;                 // null/undefined
-  if (typeof v === 'boolean') return v === false;
-  if (typeof v === 'string') return v.trim() === '';
-  if (Array.isArray(v)) return v.length === 0;
-  return false; // objekter og tal betragtes som "ikke tomme"
-}
+  pruneIf(root, data) {
+    // Fjern elementer hvor data-if peger på en "tom" eller false værdi
+    this.$all('[data-if]', root).forEach(el => {
+      const key = el.getAttribute('data-if');
+      const v = data?.[key];
+      if (this.#isEmptyForIf(v)) el.remove();
+    });
+  
+    // Fjern elementer hvor data-unless peger på en "ikke-tom" værdi
+    this.$all('[data-unless]', root).forEach(el => {
+      const key = el.getAttribute('data-unless');
+      const v = data?.[key];
+      if (!this.#isEmptyForIf(v)) el.remove();
+    });
+  
+    return root;
+  }
+  
+  // --- private helpers ---
+  #isEmptyForIf(v) {
+    if (v == null) return true;                 // null/undefined
+    if (typeof v === 'boolean') return v === false;
+    if (typeof v === 'string') return v.trim() === '';
+    if (Array.isArray(v)) return v.length === 0;
+    return false; // objekter og tal regnes som "ikke tomme"
+  }
 }
