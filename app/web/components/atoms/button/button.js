@@ -21,6 +21,24 @@ class AppButton extends BaseComponent {
       <style>${css}</style>
       ${html}
     `;
+
+    this.addClickHandler();
+  }
+
+  addClickHandler() {
+    const btn = this.shadowRoot.querySelector('button');
+    if (!btn) return;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const onClickEventName = this.getAttribute('onclickeventname');
+      
+      if (onClickEventName) {
+        this.dispatchNamedEvent(onClickEventName, {});
+      }
+    });
   }
 }
 

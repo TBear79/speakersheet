@@ -1,9 +1,7 @@
 import { BaseComponent } from '/js/BaseComponent.js';
 
 class AppViewSpeakersheet extends BaseComponent {
-  static get observedAttributes() {
-    return [];
-  }
+  static get observedAttributes() { return []; }
 
   async render() {
     const [html, css] = await Promise.all([
@@ -24,12 +22,11 @@ class AppViewSpeakersheet extends BaseComponent {
     this.#setHtmlFromSessionStorage();
   }
 
-  // Helpers
+  // --------- Helpers / utils ---------
   #jaNej = v => (v ? 'Ja' : 'Nej');
 
   #formatPhone(phone) {
     if (!phone) return '';
-    // Tillad både string og { countryCode, number }
     if (typeof phone === 'string') return phone;
     const cc = phone.countryCode ?? '';
     const nr = phone.number ?? '';
@@ -48,7 +45,6 @@ class AppViewSpeakersheet extends BaseComponent {
   #saveInitialLoadToSessionStorage() {
     const initAttr = this.getAttribute('initialload');
     if (!initAttr) return;
-
     try {
       const jsonData = JSON.parse(initAttr);
       sessionStorage.setItem('speakersheetData', JSON.stringify(jsonData));
@@ -70,164 +66,149 @@ class AppViewSpeakersheet extends BaseComponent {
       return;
     }
 
-    this.#setCongregationHtml(jsonData?.congregation);
-    this.#setElderCoordinatorHtml(jsonData?.elderCoordinator);
-    this.#setTalkCoordinatorHtml(jsonData?.talkCoordinator);
-    this.#setSpeakersHtml(jsonData?.speakers);
+    this.#setCongregation(jsonData?.congregation);
+    this.#setElderCoordinator(jsonData?.elderCoordinator);
+    this.#setTalkCoordinator(jsonData?.talkCoordinator);
+    this.#setSpeakers(jsonData?.speakers);
   }
 
-  // Sektion: Menighed
-  #setCongregationHtml(congregation) {
-    if (!this.#isNonEmptyObject(congregation)) return; // behold default tom-tekst
-
-    const card = this.requireElement('app-card[name="congregation"]');
-    const contentSlot = this.requireElement('[slot="card-content-slot"]', card);
-
-    const {
-      officialName = '',
-      nickname = '',
-      number = '',
-      address = '',
-      circuit = '',
-      meetingTime = ''
-    } = congregation ?? {};
-
-    contentSlot.innerHTML = `
-      <div class="display-rows">
-        <div class="row"><span class="label">Navn:</span><span class="value">${officialName}</span></div>
-        <div class="row"><span class="label">Kaldenavn:</span><span class="value">${nickname}</span></div>
-        <div class="row"><span class="label">Menighedsnr.:</span><span class="value">${number}</span></div>
-        <div class="row"><span class="label">Adresse:</span><span class="value">${address}</span></div>
-        <div class="row"><span class="label">Kreds:</span><span class="value">${circuit}</span></div>
-        <div class="row"><span class="label">Mødetid:</span><span class="value">${meetingTime}</span></div>
-      </div>
-    `;
+  #cardContent(cardName) {
+    const card = this.requireElement(`app-card[name="${cardName}"]`);
+    return this.requireElement('.replace-content', card);
   }
 
-  // Sektion: Koordinator for ældsterådet
-  #setElderCoordinatorHtml(elderCoordinator) {
+  // --------- Render sections via templates ---------
+
+  #setCongregation(congregation) {
+    if (!this.#isNonEmptyObject(congregation)) return;
+    const host = this.#cardContent('congregation');
+    host.innerHTML = '';
+    const node = this.cloneTpl('tpl-congregation');
+    this.setBindings(node, congregation);
+    host.appendChild(node);
+  }
+
+  #setElderCoordinator(elderCoordinator) {
     if (!this.#isNonEmptyObject(elderCoordinator)) return;
+    const host = this.#cardContent('elder-coordinator');
+    host.innerHTML = '';
+    const node = this.cloneTpl('tpl-person');
 
-    const card = this.requireElement('app-card[name="elder-coordinator"]');
-    const contentSlot = this.requireElement('[slot="card-content-slot"]', card);
+    const data = {
+      ...elderCoordinator,
+      phoneText: this.#formatPhone(elderCoordinator.phone)
+    };
 
-    const {
-      name = '',
-      email = '',
-      phone = '',
-      address = '',
-    } = elderCoordinator ?? {};
+    this.setBindings(node, data);
+    // Fjern tomme "data-if" rækker
+    this.#pruneEmptyIfRows(node, data);
 
-    const phoneText = this.#formatPhone(phone);
-
-    contentSlot.innerHTML = `
-      <div class="display-rows">
-        <div class="row"><span class="label">Navn:</span><span class="value">${name}</span></div>
-        <div class="row"><span class="label">Telefonnr.:</span><span class="value">${phoneText}</span></div>
-        <div class="row"><span class="label">Email:</span><span class="value">${email}</span></div>
-        <div class="row"><span class="label">Adresse:</span><span class="value">${address}</span></div>
-      </div>
-    `;
+    host.appendChild(node);
   }
 
-  // Sektion: Foredragskoordinator
-  #setTalkCoordinatorHtml(talkCoordinator) {
+  #setTalkCoordinator(talkCoordinator) {
     if (!this.#isNonEmptyObject(talkCoordinator)) return;
+    const host = this.#cardContent('talk-coordinator');
+    host.innerHTML = '';
+    const node = this.cloneTpl('tpl-person');
 
-    const card = this.requireElement('app-card[name="talk-coordinator"]');
-    const contentSlot = this.requireElement('[slot="card-content-slot"]', card);
+    const data = {
+      ...talkCoordinator,
+      phoneText: this.#formatPhone(talkCoordinator.phone)
+    };
 
-    const {
-      name = '',
-      email = '',
-      phone = '',
-    } = talkCoordinator ?? {};
+    this.setBindings(node, data);
+    this.#pruneEmptyIfRows(node, data);
 
-    const phoneText = this.#formatPhone(phone);
-
-    contentSlot.innerHTML = `
-      <div class="display-rows">
-        <div class="row"><span class="label">Navn:</span><span class="value">${name}</span></div>
-        <div class="row"><span class="label">Telefonnr.:</span><span class="value">${phoneText}</span></div>
-        <div class="row"><span class="label">Email:</span><span class="value">${email}</span></div>
-      </div>
-    `;
+    host.appendChild(node);
   }
 
-  // Sektion: Foredragsholdere
-  #setSpeakersHtml(speakers) {
+  #setSpeakers(speakers) {
     const list = this.#safeArray(speakers);
     if (list.length === 0) return;
 
-    const card = this.requireElement('app-card[name="speakers"]');
-    const contentSlot = this.requireElement('[slot="card-content-slot"]', card);
+    const host = this.#cardContent('speakers');
+    host.innerHTML = '';
 
     // Sortér talere på navn (da-DK)
     const sorted = [...list].sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? '', 'da'));
 
-    contentSlot.innerHTML = sorted.map((s, index) => this.#getSpeakerHtml(s, index)).join('');
+    sorted.forEach((s, index) => {
+      const node = this.#renderSpeaker(s);
+      if (index === 0) {
+        host.appendChild(node);
+      } else {
+        const wrap = document.createElement('app-card-section');
+        wrap.appendChild(node);
+        host.appendChild(wrap);
+      }
+    });
   }
 
-  #getSpeakerHtml(speaker, index) {
-    const {
-      name = '',
-      email = '',
-      phone = '',
-      funeralTalk = false,
-      weddingTalk = false,
-      memorialTalk = false,
-      talks = []
-    } = speaker ?? {};
+  #renderSpeaker(speaker) {
+    const node = this.cloneTpl('tpl-speaker');
 
-    const phoneText = this.#formatPhone(phone);
-    const emailHtml = !email ? '' : `<div class="row"><span class="label">Email:</span><span class="value">${email}</span></div>`;
+    const data = {
+      ...speaker,
+      phoneText: this.#formatPhone(speaker.phone),
+      funeralTalkText: this.#jaNej(!!speaker.funeralTalk),
+      weddingTalkText: this.#jaNej(!!speaker.weddingTalk),
+      memorialTalkText: this.#jaNej(!!speaker.memorialTalk)
+    };
 
-    const talksHtml = this.#getTalksHtml(this.#safeArray(talks));
+    this.setBindings(node, data);
+    this.#pruneEmptyIfRows(node, data);
 
-    const html = `<h3>${name}</h3>
-      <div class="display-rows">
-        <div class="row"><span class="label">Telefonnr.:</span><span class="value">${phoneText}</span></div>
-        ${emailHtml}
-        <div class="row"><span class="label">Begravelsesforedrag:</span><span class="value">${this.#jaNej(funeralTalk)}</span></div>
-        <div class="row"><span class="label">Bryllupsforedrag:</span><span class="value">${this.#jaNej(weddingTalk)}</span></div>
-        <div class="row"><span class="label">Mindehøjtidsforedrag:</span><span class="value">${this.#jaNej(memorialTalk)}</span></div>
-        <div class="talks">
-          <h4>Foredrag:</h4>
-          ${talksHtml}
-        </div>
-      </div>`;
+    // Talks
+    const talksFrag = this.#renderTalks(this.#safeArray(speaker.talks));
+    this.appendToSlot(node, 'talks', talksFrag);
 
-    return index === 0 ? html : `<app-card-section>${html}</app-card-section>`;
+    return node;
   }
 
-  #getTalksHtml(talks) {
+  #renderTalks(talks) {
     if (!Array.isArray(talks) || talks.length === 0) {
-      return `<div class="display-rows"><div class="row"><span class="label">—</span><span class="value">Ingen foredrag</span></div></div>`;
+      const empty = this.cloneTpl('tpl-talkline');
+      this.setBindings(empty, { language: '—', numbers: 'Ingen foredrag' });
+      return empty;
     }
 
-    const languages = [...new Set(
-      talks
-        .map(t => t?.language)
-        .filter(Boolean)
-    )];
+    // Grupér pr. sprog
+    const byLang = talks.reduce((m, t) => {
+      const lang = t?.language;
+      if (!lang) return m;
+      (m[lang] ||= []).push(t?.talkNumber);
+      return m;
+    }, {});
 
-    const talkLines = languages
-      .sort((a, b) => a.localeCompare(b, 'da'))
-      .map(lang => {
-        const nums = talks
-          .filter(t => t?.language === lang && typeof t?.talkNumber === 'number')
-          .sort((a, b) => a.talkNumber - b.talkNumber)
-          .map(t => t.talkNumber)
+    const frag = document.createDocumentFragment();
+
+    Object.entries(byLang)
+      .sort(([a],[b]) => a.localeCompare(b, 'da'))
+      .forEach(([language, nums]) => {
+        const numbers = (nums || [])
+          .filter(n => typeof n === 'number')
+          .sort((a, b) => a - b)
           .join(', ');
 
-        return [lang, nums];
+        const line = this.cloneTpl('tpl-talkline');
+        this.setBindings(line, { language: `${language}:`, numbers: numbers || '—' });
+        frag.appendChild(line);
       });
 
-    return talkLines.map(([language, numbers]) => `
-      <div class="display-rows">
-        <div class="row"><span class="label">${language}:</span><span class="value">${numbers || '—'}</span></div>
-      </div>
-    `).join('');
+    return frag;
+  }
+
+  #pruneEmptyIfRows(root, data) {
+    // Fjerner elementer med [data-if="path"] når path er tom/undefined
+    // vi vil gerne kunne søge i fragmentet
+    this.$all('[data-if]', root).forEach(el => {
+      const path = el.getAttribute('data-if');
+      const v = path ? path.split('.').reduce((o, k) => (o?.[k]), data) : undefined;
+      if (v == null || v === '' || (Array.isArray(v) && v.length === 0)) {
+        el.remove();
+      }
+    });
   }
 }
 

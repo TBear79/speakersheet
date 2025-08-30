@@ -1,27 +1,92 @@
 <app-card name="congregation">
   <span slot="card-header-slot">Menighed</span>
   <span slot="card-content-slot">
-    Information om menigheden er ikke udfyldt endnu
+    <span class="replace-content">
+      Information om menigheden er ikke udfyldt endnu
+    </span>
+    <div class="card-footer">
+      <app-button class="congregation-button">
+        <span>Redigér</span>
+      </app-button>
+    </div>
   </span>
 </app-card>
+
 <app-card name="elder-coordinator">
   <span slot="card-header-slot">Koordinator for ældsterådet</span>
   <span slot="card-content-slot">
-    Information om koordinator for ældsterådet er ikke udfyldt endnu
+    <span class="replace-content">
+      Information om koordinator for ældsterådet er ikke udfyldt endnu
+    </span>
+    <div class="card-footer">
+      <app-button class="congregation-button">
+        <span>Redigér</span>
+      </app-button>
+    </div>
   </span>
 </app-card>
+
 <app-card name="talk-coordinator">
   <span slot="card-header-slot">Foredragskoordinator</span>
   <span slot="card-content-slot">
-    Information om foredragskoordinator er ikke udfyldt endnu
+    <span class="replace-content">
+      Information om foredragskoordinator er ikke udfyldt endnu
+    </span>
+    <div class="card-footer">
+      <app-button class="congregation-button">
+        <span>Redigér</span>
+      </app-button>
+    </div>
   </span>
 </app-card>
+
 <app-card name="speakers">
   <span slot="card-header-slot">Foredragsholdere</span>
   <span slot="card-content-slot">
-    Der er ikke tilføjet nogen foredragsholdere endnu
-{{!-- 
-    <app-card-section>Foredragsholder 1</app-card-section>
-    <app-card-section>Foredragsholder 2</app-card-section> --}}
+    <span class="replace-content">
+      Der er ikke tilføjet nogen foredragsholdere endnu
+    </span>
   </span>
 </app-card>
+
+<!-- ========= Templates ========= -->
+<template id="tpl-congregation">
+  <div class="display-rows">
+    <div class="row"><span class="label">Navn:</span><span class="value" data-bind="officialName"></span></div>
+    <div class="row"><span class="label">Kaldenavn:</span><span class="value" data-bind="nickname"></span></div>
+    <div class="row"><span class="label">Menighedsnr.:</span><span class="value" data-bind="number"></span></div>
+    <div class="row"><span class="label">Adresse:</span><span class="value" data-bind="address"></span></div>
+    <div class="row"><span class="label">Kreds:</span><span class="value" data-bind="circuit"></span></div>
+    <div class="row"><span class="label">Mødetid:</span><span class="value" data-bind="meetingTime"></span></div>
+  </div>
+</template>
+
+<template id="tpl-person">
+  <div class="display-rows">
+    <div class="row"><span class="label">Navn:</span><span class="value" data-bind="name"></span></div>
+    <div class="row"><span class="label">Telefonnr.:</span><span class="value" data-bind="phoneText"></span></div>
+    <div class="row"><span class="label">Email:</span><span class="value" data-bind="email"></span></div>
+    <div class="row" data-if="address"><span class="label">Adresse:</span><span class="value" data-bind="address"></span></div>
+  </div>
+</template>
+
+<template id="tpl-speaker">
+  <h3 data-bind="name"></h3>
+  <div class="display-rows">
+    <div class="row"><span class="label">Telefonnr.:</span><span class="value" data-bind="phoneText"></span></div>
+    <div class="row" data-if="email"><span class="label">Email:</span><span class="value" data-bind="email"></span></div>
+    <div class="row"><span class="label">Begravelsesforedrag:</span><span class="value" data-bind="funeralTalkText"></span></div>
+    <div class="row"><span class="label">Bryllupsforedrag:</span><span class="value" data-bind="weddingTalkText"></span></div>
+    <div class="row"><span class="label">Mindehøjtidsforedrag:</span><span class="value" data-bind="memorialTalkText"></span></div>
+    <div class="talks">
+      <h4>Foredrag:</h4>
+      <div data-slot="talks"></div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-talkline">
+  <div class="display-rows">
+    <div class="row"><span class="label" data-bind="language"></span><span class="value" data-bind="numbers"></span></div>
+  </div>
+</template>
