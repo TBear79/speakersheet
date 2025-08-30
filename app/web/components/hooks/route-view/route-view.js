@@ -77,7 +77,8 @@ class AppRouteView extends BaseComponent {
     const fetchFn = (url) => fetch(url, {
       method: 'POST',
       headers: { ...(isSpa ? { 'x-spa-request': 'true' } : {}), ...headers },
-      body
+      body,
+      cache: 'no-cache'
     });
 
     this.#handlePushState(isSpa, href);

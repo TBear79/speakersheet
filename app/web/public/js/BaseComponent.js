@@ -30,6 +30,14 @@ export class BaseComponent extends HTMLElement {
       console.warn('BaseComponent.render() was called, but not implemented.');
     }
 
+    requireElement(selector, root = this.shadowRoot) {
+      const el = root.querySelector(selector);
+      
+      if (!el) throw new Error(`[${this.tagName.toLowerCase()}] Required element not found: ${selector}`);
+      
+      return el;
+    }
+
     dispatchNamedEvent(eventName, detail = {}, opts = {}) {
       this.#validateEventName(eventName);
 

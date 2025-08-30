@@ -12,3 +12,9 @@
   border-radius: 0.75rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
 }
+
+@media (max-width: 768px) {
+  .content {
+    padding-inline: var(--page-padding-mobile);
+  }
+}

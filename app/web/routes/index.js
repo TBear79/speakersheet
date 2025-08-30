@@ -43,9 +43,7 @@ router.get('/create-speakersheet', (req, res) => {
   });
 });
 
-router.use(express.raw({ type: 'application/pdf' }));
-
-router.post('/edit-speakersheet', async (req, res) => {
+router.post('/edit-speakersheet', express.raw({ type: 'application/pdf' }), async (req, res) => {
   const isSpa = req.headers['x-spa-request'] === 'true';
 
   const pdfData = await readPdfJson(req.body)
