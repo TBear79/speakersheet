@@ -229,7 +229,9 @@ class AppViewSpeakersheet extends BaseComponent {
 
   #bindCongregationEdit() {
     this.addEventListener(this.#onCongregationEditClick, e => {
-      console.log('[congragationEdit]', e);
+      const elem = this.shadowRoot.querySelector('app-edit-congregation');
+      var currentStatus = elem.getAttribute('status')
+      elem.setAttribute('status', currentStatus === 'closed' ? 'open' : 'closed');
     });
   }
 
