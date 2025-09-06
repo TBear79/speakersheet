@@ -14,6 +14,12 @@ router.get('/components/pages/home/home-markup', (req, res) => {
 });
 
 // 2. Serve JS og CSS som statiske filer
+
+router.get('/components/pages/home/home-components', (req, res) => {
+  res.type('application/javascript');
+  res.sendFile(path.join(__dirname, `home.components.js`));
+});
+
 router.get('/components/pages/home/home-script', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, `home.js`));

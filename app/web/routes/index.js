@@ -62,7 +62,8 @@ router.get('/', (req, res) => {
   const isSpa = req.headers['x-spa-request'] === 'true';
   res.render('home', { 
     title: 'SpeakerSheet',
-    layout: isSpa ? false : 'main'
+    layout: isSpa ? false : 'main',
+    pageComponent: 'home'
   });
 });
 
@@ -71,7 +72,8 @@ router.get('/create-speakersheet', (req, res) => {
   res.render('view-speakersheet', { 
     title: 'Opret ny foredragsholderliste',
     layout: isSpa ? false : 'main',
-    initialLoad: JSON.stringify({})
+    initialLoad: JSON.stringify({}),
+    pageComponent: 'view-speakersheet'
   });
 });
 
@@ -83,7 +85,8 @@ router.post('/edit-speakersheet', express.raw({ type: 'application/pdf' }), asyn
   res.render('view-speakersheet', { 
     title: 'Rediger foredragsholderliste',
     layout: isSpa ? false : 'main',
-    initialLoad: JSON.stringify(pdfData)
+    initialLoad: JSON.stringify(pdfData),
+    pageComponent: 'view-speakersheet'
   });
 });
 
@@ -91,14 +94,11 @@ router.get('/edit-speakersheet', (req, res) => {
   const isSpa = req.headers['x-spa-request'] === 'true';
   res.render('view-speakersheet', { 
     title: 'Rediger ny foredragsholderliste',
-    layout: isSpa ? false : 'main'
+    layout: isSpa ? false : 'main',
+    pageComponent: 'view-speakersheet'
   });
 });
 
-
-router.post('/upload', (req, res) => {
-  // parse uploaded PDF with pdf-lib
-});
 
 router.post('/generate', (req, res) => {
   // generate PDF and send as download

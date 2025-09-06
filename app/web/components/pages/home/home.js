@@ -11,12 +11,14 @@ class AppHome extends BaseComponent {
   async render() {
     const query = new URLSearchParams({ onNewPdfLinkClickEventName: this.#onNewPdfLinkClickEventName, onUploadAreaFileDropEventName: this.#onUploadAreaFileDropEventName  }).toString();
 
-    const [html, css] = await Promise.all([
+    const [components, html, css] = await Promise.all([
+      fetch('/components/pages/home/home-components').then(res => res.text()).catch(() => ''),
       fetch(`/components/pages/home/home-markup?${query}`).then(res => res.text()),
       fetch('/components/pages/home/home-styles').then(res => res.text()).catch(() => '')
     ]);
 
     this.shadowRoot.innerHTML = `
+      <script type="module">${components}</script>
       <style>${css}</style>
       ${html}
     `;
