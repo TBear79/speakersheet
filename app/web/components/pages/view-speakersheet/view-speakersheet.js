@@ -58,7 +58,9 @@ class AppViewSpeakersheet extends BaseComponent {
 
   #saveInitialLoadToSessionStorage() {
     const initAttr = this.getAttribute('initialload');
+    
     if (!initAttr) return;
+    
     try {
       const jsonData = JSON.parse(initAttr);
       sessionStorage.setItem('speakersheetData', JSON.stringify(jsonData));

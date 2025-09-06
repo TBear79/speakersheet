@@ -6,6 +6,20 @@ class AppImage extends BaseComponent {
     }
   
     async render() {
+      const [html, css] = await Promise.all([
+        fetch(`/components/atoms/image/image-markup`).then(res => res.text()),
+        fetch('/components/atoms/image/image-styles').then(res => res.text())
+      ]);
+  
+      this.shadowRoot.innerHTML = `
+        <style>${css}</style>
+        ${html}
+      `;
+
+      this.#setAttributes();
+    }
+    
+    #setAttributes(){
       const src = this.getAttribute('src') || '';
       const alt = this.getAttribute('alt');
   
@@ -13,20 +27,13 @@ class AppImage extends BaseComponent {
       if (alt === null) {
         console.warn('<app-image> mangler alt-attribut. Dette bryder WCAG.');
       }
-  
-      const query = new URLSearchParams({ src, alt: alt || '' }).toString();
-  
-      const [html, css] = await Promise.all([
-        fetch(`/components/atoms/image/image-markup?${query}`).then(res => res.text()),
-        fetch('/components/atoms/image/image-style').then(res => res.text())
-      ]);
-  
-      this.shadowRoot.innerHTML = `
-        <style>${css}</style>
-        ${html}
-      `;
+
+      var img = this.shadowRoot.querySelector('img');
+      img.setAttribute('src', src);
+      img.setAttribute('alt', alt);
     }
-  }
+
+}
   
   customElements.define('app-image', AppImage);
   

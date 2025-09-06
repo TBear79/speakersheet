@@ -6,15 +6,8 @@ class AppText extends BaseComponent {
   }
 
   async render() {
-    const value = this.getAttribute('value') || '';
-    const placeholder = this.getAttribute('placeholder') || '';
-    const maxLength = this.getAttribute('max-length') || '';
-    const name = this.getAttribute('name') || '';
-
-    const query = new URLSearchParams({ value, placeholder, maxLength, name }).toString();
-
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/text/text-markup?${query}`).then(res => res.text()),
+      fetch(`/components/atoms/text/text-markup`).then(res => res.text()),
       fetch('/components/atoms/text/text-styles').then(res => res.text())
     ]);
 
@@ -22,6 +15,22 @@ class AppText extends BaseComponent {
       <style>${css}</style>
       ${html}
     `;
+
+    this.#setAttributes();
+  }
+
+  #setAttributes() {
+    const value = this.getAttribute('value') || '';
+    const placeholder = this.getAttribute('placeholder') || '';
+    const maxLength = this.getAttribute('max-length') || '';
+    const name = this.getAttribute('name') || '';
+
+    const input = this.shadowRoot.querySelector('button');
+
+    input.setAttribute('value', value);
+    input.setAttribute('placeholder', placeholder);
+    input.setAttribute('max-length', maxLength);
+    input.setAttribute('name', name);
   }
 }
 

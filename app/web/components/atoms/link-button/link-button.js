@@ -24,6 +24,28 @@ class AppLinkButton extends BaseComponent {
       <style>${css}</style>
       ${html}
     `;
+
+    this.#setAttributes();
+  }
+
+  #setAttributes() {
+    const href = this.getAttribute('href') || '#';
+    const target = this.getAttribute('target') || '_self';
+    const rel = this.getAttribute('rel') || (target === '_blank' ? 'noopener noreferrer' : '');
+    const ariaLabel = this.getAttribute('aria-label') || '';
+    const isSpa = this.hasAttribute('spa');
+    const onClickEventName = this.getAttribute('onclickeventname') || '';
+
+    const appLink = this.shadowRoot.querySelector('app-link');
+
+    appLink.setAttribute('href', href);
+    appLink.setAttribute('target', target);
+    appLink.setAttribute('rel', rel);
+    appLink.setAttribute('aria-label', ariaLabel);
+
+    appLink.toggleAttribute('spa', isSpa);
+
+    appLink.setAttribute('onclickeventname', onClickEventName);
   }
 }
 

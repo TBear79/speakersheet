@@ -6,14 +6,8 @@ class AppLink extends BaseComponent {
   }
 
   async render() {
-    const href = this.getAttribute('href') || '#';
-    const target = this.getAttribute('target') || '_self';
-    const rel = this.getAttribute('rel') || (target === '_blank' ? 'noopener noreferrer' : '');
-    const onClickEventName = this.getAttribute('onclickeventname') || '';
-    const query = new URLSearchParams({ href, target, rel, onClickEventName }).toString();
-
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/link/link-markup?${query}`).then(res => res.text()),
+      fetch(`/components/atoms/link/link-markup`).then(res => res.text()),
       fetch('/components/atoms/link/link-styles').then(res => res.text())
     ]);
 
@@ -22,7 +16,22 @@ class AppLink extends BaseComponent {
       ${html}
     `;
 
+    this.#setAttributes();
     this.addClickHandler();
+  }
+
+  #setAttributes() {
+    const href = this.getAttribute('href') || '#';
+    const target = this.getAttribute('target') || '_self';
+    const rel = this.getAttribute('rel') || (target === '_blank' ? 'noopener noreferrer' : '');
+    const onClickEventName = this.getAttribute('onclickeventname') || '';
+
+    const anchor = this.shadowRoot.querySelector('a');
+
+    anchor.setAttribute('href', href);
+    anchor.setAttribute('target', target);
+    anchor.setAttribute('rel', rel);
+    anchor.setAttribute('onclickeventname', onClickEventName);
   }
 
   addClickHandler() {

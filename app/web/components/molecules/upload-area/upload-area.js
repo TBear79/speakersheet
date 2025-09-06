@@ -20,7 +20,15 @@ class AppUploadArea extends BaseComponent {
       ${html}
     `;
 
+    this.#setAttributes();
     this.#setupEvents();
+  }
+
+  #setAttributes() {
+    const container = this.shadowRoot.querySelector('.upload-container');
+
+    if(this.#isClickable())
+      container.classList.add('clickable');
   }
 
   #isClickable() {
@@ -81,15 +89,6 @@ class AppUploadArea extends BaseComponent {
       this.dispatchNamedEvent(onFileDropEventName, { files });
     }
   };
-
-  #handleFiles(files) {
-    const handlerName = this.getAttribute('onfiledrop');
-    if (handlerName && typeof window[handlerName] === 'function') {
-      window[handlerName](files);
-    } else {
-      console.warn('No valid onfiledrop handler found:', handlerName);
-    }
-  }
 
   #setDragOver(state) {
     const container = this.shadowRoot.querySelector('.upload-container');

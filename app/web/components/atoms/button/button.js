@@ -6,14 +6,8 @@ class AppButton extends BaseComponent {
   }
 
   async render() {
-    const type = this.getAttribute('type') || 'button';
-    const ariaLabel = this.getAttribute('aria-label') || '';
-    const variant = this.getAttribute('variant') || 'neutral';
-
-    const query = new URLSearchParams({ type, ariaLabel, variant }).toString();
-
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/button/button-markup?${query}`).then(res => res.text()),
+      fetch(`/components/atoms/button/button-markup`).then(res => res.text()),
       fetch('/components/atoms/button/button-styles').then(res => res.text())
     ]);
 
@@ -22,7 +16,16 @@ class AppButton extends BaseComponent {
       ${html}
     `;
 
+    this.#setAttributes();
     this.addClickHandler();
+  }
+
+  #setAttributes() {
+    const btn = this.shadowRoot.querySelector('button');
+
+    if (this.hasAttribute('type')) btn.setAttribute('type', this.getAttribute('type') || 'button');
+    if (this.hasAttribute('aria-label')) btn.setAttribute('aria-label', this.getAttribute('aria-label') || '');
+    if (this.hasAttribute('variant')) btn.setAttribute('variant', this.getAttribute('variant') || '');
   }
 
   addClickHandler() {

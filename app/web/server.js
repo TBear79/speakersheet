@@ -21,5 +21,5 @@ app.use('/', routes);
 reload(app);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`SpeakerSheet running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.info(`SpeakerSheet running on http://localhost:${PORT}`));
 

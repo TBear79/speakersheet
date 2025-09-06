@@ -9,7 +9,7 @@ const router = express.Router();
 
 const componentsRoot = path.join(__dirname, '../components');
 
-const atomicGroups = ['atoms', 'molecules', 'organisms', 'pages', 'hooks'];
+const atomicGroups = ['organisms', 'pages', 'hooks'];
 
 for (const group of atomicGroups) {
   const groupPath = path.join(componentsRoot, group);
@@ -26,6 +26,38 @@ for (const group of atomicGroups) {
   }
 }
 
+router.get('/components/:category(atoms|molecules)/:component/:type', (req, res, next) => {
+  const { category, component, type } = req.params;
+
+  if (!/^[a-z0-9-]+$/.test(component)) {
+    return res.status(400).send('Invalid component name');
+  }
+  const typePattern = new RegExp(`^${component}-(script|styles|markup)$`);
+  if (!typePattern.test(type)) {
+    return res.status(400).send('Invalid type');
+  }
+
+  const typeFileMapping = {
+    script: 'js',
+    styles: 'css',
+    markup: 'html', 
+  };
+
+  // udtræk suffix (script|styles|markup) fra type
+  const suffix = type.match(/(script|styles|markup)$/)[1];
+  const fileName = `${component}.${typeFileMapping[suffix]}`;
+
+  const componentsRoot = path.join(__dirname, '../components');
+  const absPath = path.join(componentsRoot, category, component, fileName);
+
+  res.sendFile(absPath, (err) => {
+    if (err) {
+      if (err.code === 'ENOENT') return res.status(404).send('File not found');
+      return next(err);
+    }
+  });
+});
+
 router.get('/', (req, res) => {
   const isSpa = req.headers['x-spa-request'] === 'true';
   res.render('home', { 
@@ -39,7 +71,7 @@ router.get('/create-speakersheet', (req, res) => {
   res.render('view-speakersheet', { 
     title: 'Opret ny foredragsholderliste',
     layout: isSpa ? false : 'main',
-    initialLoad: {}
+    initialLoad: JSON.stringify({})
   });
 });
 

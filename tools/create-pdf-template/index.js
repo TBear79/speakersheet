@@ -11,7 +11,7 @@ const run = async () => {
     const buffer = await createPdf(metaJson);
     await fs.mkdir(path.dirname(outPath), { recursive: true });
     await fs.writeFile(outPath, buffer);
-    console.log(`✅ Skabelon skrevet til: ${outPath}`);
+    console.info(`✅ Skabelon skrevet til: ${outPath}`);
 };
 
 run();
