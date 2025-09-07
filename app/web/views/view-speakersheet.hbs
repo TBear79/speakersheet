@@ -1,3 +1,4 @@
 {{#> layout title=title }}
+  <script type="module" src="/components/pages/{{pageComponent}}/{{pageComponent}}-components"></script>
   <app-view-speakersheet {{#if initialLoad}}initialload="{{initialLoad}}"{{/if}}></app-view-speakersheet>
 {{/layout}}

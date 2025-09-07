@@ -17,6 +17,11 @@ router.get('/components/pages/view-speakersheet/view-speakersheet-markup', (req,
 });
 
 // 2. Serve JS og CSS som statiske filer
+router.get('/components/pages/view-speakersheet/view-speakersheet-components', (req, res) => {
+  res.type('application/javascript');
+  res.sendFile(path.join(__dirname, `view-speakersheet.components.js`));
+});
+
 router.get('/components/pages/view-speakersheet/view-speakersheet-script', (req, res) => {
   res.type('application/javascript');
   res.sendFile(path.join(__dirname, `view-speakersheet.js`));
