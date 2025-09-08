@@ -10,10 +10,10 @@
       </p>
 
       <div class="card-center">
-        <app-button variant="primary" aria-label="Upload din foredragsholderliste" onclick="alert('Uploader...')">
-          <span slot="icon">🔧</span>
-          Upload din foredragsholderliste
-        </app-button>
+          <app-file-button accept="application/pdf" variant="primary" onfileeventname="{{onUploadAreaFileDropEventName}}" onevent="upload-docs">
+            <span slot="icon">🔧</span>
+            Upload din foredragsholderliste
+          </app-file-button>
       </div>
     </app-upload-area>
   </span>

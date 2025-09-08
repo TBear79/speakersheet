@@ -2,6 +2,7 @@ import '/components/hooks/route-view/route-view-script';
 
 import '/components/atoms/button/button-script';
 import '/components/atoms/card-section/card-section-script';
+import '/components/atoms/file-button/file-button-script';
 import '/components/atoms/image/image-script';
 import '/components/atoms/link/link-script';
 import '/components/atoms/link-button/link-button-script';

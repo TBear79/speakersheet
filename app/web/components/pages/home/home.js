@@ -25,8 +25,18 @@ class AppHome extends BaseComponent {
   }
 
   #bindEvents() {
-    this.addEventListener(this.#onUploadAreaFileDropEventName, e => {
-      const file = e.detail?.files?.[0];
+    this.addEventListener(this.#onUploadAreaFileDropEventName, this.#handleFileSelect);
+
+    this.addEventListener(this.#onNewPdfLinkClickEventName, e => {
+      this.dispatchNamedEvent(
+        this.closest('app-route-view')?.getAttribute('eventget'),
+        { ...e.detail }
+      );
+    });
+  }
+
+  #handleFileSelect(e) {
+    const file = e.detail?.files?.[0];
       if (!file) return;
 
       this.dispatchNamedEvent(
@@ -38,14 +48,6 @@ class AppHome extends BaseComponent {
           headers: { 'Content-Type': file.type || 'application/pdf' }
         }
       );
-    });
-
-    this.addEventListener(this.#onNewPdfLinkClickEventName, e => {
-      this.dispatchNamedEvent(
-        this.closest('app-route-view')?.getAttribute('eventget'),
-        { ...e.detail }
-      );
-    });
   }
 }
 
