@@ -4,12 +4,15 @@ import '/components/atoms/button/button-script';
 import '/components/atoms/card-section/card-section-script';
 import '/components/atoms/file-button/file-button-script';
 import '/components/atoms/image/image-script';
+import '/components/atoms/label/label-script';
 import '/components/atoms/link/link-script';
 import '/components/atoms/link-button/link-button-script';
 import '/components/atoms/modal/modal-script';
-
+import '/components/atoms/text/text-script';
+import '/components/atoms/validation-message/validation-message-script';
 
 import '/components/molecules/card/card-script';
+import '/components/molecules/form-text/form-text-script';
 import '/components/molecules/upload-area/upload-area-script';
 
 import '/components/organisms/edit-congregation/edit-congregation-script';
