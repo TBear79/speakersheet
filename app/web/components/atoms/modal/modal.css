@@ -1,0 +1,75 @@
+:host {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    z-index: var(--modal-z, 1000); /* hele komponenten over resten */
+  }
+
+  :host([open]) { display: grid; }
+  
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--modal-backdrop, rgba(0,0,0,.35));
+    opacity: 0;
+    transition: opacity .18s ease-out;
+    pointer-events: auto;  /* fanger klik så de ikke rammer siden */
+    z-index: 0;            /* under dialogen */
+  }
+  
+  :host([open]) .backdrop { opacity: 1; }
+  
+  .dialog {
+    position: relative;
+    z-index: 1;            /* over backdrop */
+    width: 100%;
+    max-width: var(--modal-max-w, min(92vw, 720px));
+    max-height: var(--modal-max-h, 90dvh);
+    overflow: auto;
+    border-radius: var(--modal-radius, 1.25rem);
+    padding: var(--modal-padding, 1.25rem 1rem 1rem);
+    background: var(--modal-bg, #f3f4f6);
+    box-shadow:
+      12px 12px 24px rgba(0,0,0,.12);
+    transform: translateY(8px);
+    opacity: 0;
+    transition: transform .18s ease-out, opacity .18s ease-out;
+    outline: none;
+  }
+  
+  :host([open]) .dialog {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .dialog-header {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: .75rem;
+  }
+  
+  .dialog-content {
+    line-height: 1.55;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  /* Når modal er lukket, må intet interageres */
+  :host(:not([open])) .dialog {
+    pointer-events: none;
+  }
+  
+  /* Fokusvagter er usynlige men tabbable */
+  .focus-sentinel {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  

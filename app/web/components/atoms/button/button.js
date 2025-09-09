@@ -37,7 +37,7 @@ class AppButton extends BaseComponent {
       e.stopPropagation();
 
       const onClickEventName = this.getAttribute('onclickeventname');
-      
+
       if (onClickEventName) {
         this.dispatchNamedEvent(onClickEventName, {});
       }

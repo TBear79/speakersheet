@@ -1,3 +1,9 @@
-<div>
-  Edit Congregation organism
-</div>
+<app-modal name="edit-congregation" backdrop-close>
+  <span slot="title">Redigér menighed</span>
+  
+  Menighedsform
+  
+  <app-button slot="actions" name="cancel-button" onclickeventname="editcongregation:modalcancelbutton:click">Annullér</app-button>
+  <app-button slot="actions" name="save-button" variant="primary" onclickeventname="editcongregation:savebutton:click">Gem</app-button>
+</app-modal>
+

@@ -6,6 +6,8 @@ import '/components/atoms/file-button/file-button-script';
 import '/components/atoms/image/image-script';
 import '/components/atoms/link/link-script';
 import '/components/atoms/link-button/link-button-script';
+import '/components/atoms/modal/modal-script';
+
 
 import '/components/molecules/card/card-script';
 import '/components/molecules/upload-area/upload-area-script';

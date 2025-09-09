@@ -1,0 +1,19 @@
+<div class="backdrop" part="backdrop" aria-hidden="true"></div>
+
+<div class="dialog" part="dialog" role="dialog" aria-modal="true" aria-labelledby="app-modal-title" tabindex="-1">
+  <header class="dialog-header">
+    <slot name="title" id="app-modal-title"></slot>
+  </header>
+
+  <section class="dialog-content">
+    <slot></slot>
+  </section>
+
+  <footer class="dialog-actions">
+    <slot name="actions"></slot>
+  </footer>
+
+  <!-- Fokusvagter til trap -->
+  <span class="focus-sentinel start" tabindex="0" aria-hidden="true"></span>
+  <span class="focus-sentinel end" tabindex="0" aria-hidden="true"></span>
+</div>
