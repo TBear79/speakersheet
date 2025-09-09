@@ -1,0 +1,20 @@
+:host {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+  
+  .message {
+    display: none; /* skjult som default */
+    color: #b91c1c; /* default = error rød */
+  }
+  
+  .message:not([hidden]) {
+    display: block;
+  }
+  
+  /* varianter */
+  .message[variant="warning"] { color: #a16207; }
+  .message[variant="success"] { color: #166534; }
+  .message[variant="muted"]   { color: #6b7280; }
+  
