@@ -1,0 +1,129 @@
+import { BaseComponent } from '/js/BaseComponent.js';
+
+class AppFormText extends BaseComponent {
+  static get observedAttributes() {
+    return [
+      'for',
+      'label',
+      'placeholder',
+      'value',
+      'max-length',
+      'required',
+      'aria-label',
+      'type',
+      'validation-text',
+      'validation-variant',
+      'oninputeventname',
+      'onchangeeventname'
+    ];
+  }
+
+  async render() {
+    const [html, css] = await Promise.all([
+      fetch('/components/molecules/form-text/form-text-markup').then(r => r.text()),
+      fetch('/components/molecules/form-text/form-text-styles').then(r => r.text())
+    ]);
+
+    this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;
+
+    this.#applyAttributes();
+    this.#wireEvents();
+  }
+
+  attributeChangedCallback() {
+    if (this.shadowRoot?.childElementCount) {
+      this.#applyAttributes();
+    }
+  }
+
+  get value() {
+    return this.#input()?.getAttribute('value') || '';
+  }
+  set value(v) {
+    const inp = this.#input();
+    if (inp) inp.setAttribute('value', v ?? '');
+  }
+
+  #label() { return this.shadowRoot.querySelector('.label'); }
+  #input() { return this.shadowRoot.querySelector('.input'); }
+  #msg()   { return this.shadowRoot.querySelector('.message'); }
+
+  #applyAttributes() {
+    const lbl = this.#label();
+    const inp = this.#input();
+    const msg = this.#msg();
+    if (!lbl || !inp || !msg) return;
+
+    // --- for/id binding ---
+    const forId = this.getAttribute('for') || this.#ensureId(inp);
+    lbl.setAttribute('for', forId);
+    lbl.setAttribute('text', this.getAttribute('label') || '');
+    this.toggleAttributeOn(lbl, 'required', this.hasAttribute('required'));
+
+    inp.setAttribute('id', forId);
+
+    this.#copyAttr('placeholder', inp);
+    this.#copyAttr('value', inp);
+    this.#copyAttr('max-length', inp);
+    this.#copyAttr('type', inp, 'text');
+    this.#copyAttr('aria-label', inp);
+
+    // --- validation ---
+    const vText = this.getAttribute('validation-text');
+    const vVar  = this.getAttribute('validation-variant');
+
+    if (vVar) msg.setAttribute('variant', vVar); else msg.removeAttribute('variant');
+    if (vText && vText.trim().length > 0) {
+      msg.setAttribute('text', vText);
+    } else {
+      msg.removeAttribute('text');
+    }
+  }
+
+  #wireEvents() {
+    const inp = this.#input();
+    if (!inp) return;
+
+    const onInputName = this.getAttribute('oninputeventname');
+    const onChangeName = this.getAttribute('onchangeeventname');
+
+    const emit = (evtName) => {
+      const detail = {
+        id: this.getAttribute('for') || this.#input()?.getAttribute('id') || '',
+        name: this.getAttribute('name') || '',
+        value: this.value
+      };
+      this.dispatchNamedEvent(evtName, detail);
+    };
+
+    inp.replaceWith(inp.cloneNode(true));
+    const fresh = this.#input();
+
+    if (onInputName) {
+      fresh.addEventListener('input', () => emit(onInputName));
+    }
+    if (onChangeName) {
+      fresh.addEventListener('change', () => emit(onChangeName));
+    }
+  }
+
+  #ensureId(el) {
+    let id = el.getAttribute('id');
+    if (!id) {
+      id = `fi-${Math.random().toString(36).slice(2, 8)}`;
+      el.setAttribute('id', id);
+    }
+    return id;
+  }
+
+  #copyAttr(attr, target, fallback = null) {
+    if (this.hasAttribute(attr)) {
+      target.setAttribute(attr, this.getAttribute(attr) || fallback || '');
+    } else {
+      if (fallback && attr === 'type') target.setAttribute(attr, fallback);
+      else target.removeAttribute(attr);
+    }
+  }
+}
+
+customElements.define('app-form-text', AppFormText);
