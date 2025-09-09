@@ -1,0 +1,29 @@
+:host {
+    display: inline-block;
+  }
+  
+  label {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Skjul * som default; vis kun hvis [required] er sat via JS */
+  .required-indicator {
+    display: none;
+    margin-left: 0.25rem;
+  }
+  
+  /* Varianten styres via attribute på selve <label> (ligesom button) */
+  label[variant="muted"] { color: #6b7280; }
+  label[variant="error"] { color: #b91c1c; }
+  label[variant="warning"] { color: #a16207; }
+  label[variant="success"] { color: #166534; }
+  
+  /* Når required er aktivt */
+  label[required] .required-indicator {
+    display: inline;
+  }
+  
