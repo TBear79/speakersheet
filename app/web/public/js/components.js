@@ -9,6 +9,7 @@ import '/components/atoms/link/link-script';
 import '/components/atoms/link-button/link-button-script';
 import '/components/atoms/modal/modal-script';
 import '/components/atoms/text/text-script';
+import '/components/atoms/time-picker/time-picker-script';
 import '/components/atoms/validation-message/validation-message-script';
 
 import '/components/molecules/card/card-script';

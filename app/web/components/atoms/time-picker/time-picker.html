@@ -1,0 +1,30 @@
+<!-- Atom markup (ren HTML). Begge UIs er til stede; JS vælger hvilken der vises. -->
+<label class="tp-native" data-tp-native hidden>
+  <input type="time" />
+</label>
+
+<div class="tp" data-tp-custom hidden role="group" aria-label="Time picker" aria-expanded="false">
+  <button type="button" class="tp-trigger" data-tp-trigger aria-haspopup="dialog" aria-pressed="false">
+    <span data-tp-label>Select time</span>
+    <svg class="tp-caret" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5z"/></svg>
+  </button>
+
+  <div class="tp-panel" role="dialog" data-tp-panel hidden>
+    <div class="tp-row">
+      <!-- Hurtig tekstindtastning (auto kolon) -->
+      <input class="tp-edit" data-tp-edit
+             type="text" inputmode="numeric" autocomplete="off"
+             spellcheck="false" aria-label="Time (HH:MM)" placeholder="hh:mm" />
+
+      <!-- Selects (kan bruges sammen med tekstfeltet) -->
+      <select class="tp-hours" data-tp-hours aria-label="Hours"></select>
+      <span class="tp-sep">:</span>
+      <select class="tp-minutes" data-tp-minutes aria-label="Minutes"></select>
+      <!-- AM/PM vises/skjules af CSS via :host([format="12"]) -->
+      <select class="tp-ampm" data-tp-ampm aria-label="AM/PM"></select>
+    </div>
+    <div class="tp-actions">
+      <button type="button" class="tp-clear" data-tp-clear>Ryd</button>
+    </div>
+  </div>
+</div>
