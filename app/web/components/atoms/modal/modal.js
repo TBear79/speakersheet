@@ -107,10 +107,7 @@ class AppModal extends BaseComponent {
     // Backdrop lukker ikke – men spiser klik
     backdrop?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
 
-    // Gem fokusafsender når modal annoncerer åbning
-    this.addEventListener('modal-opened', () => { this.#prevFocused = document.activeElement; });
-
-    // Keyboard
+    // Keyboard: kun én keydown-trap på dialogen
     this.addEventListener('keydown', (e) => {
       if (!this.open) return;
       if (e.key === 'Escape' && this.escClose) {
@@ -121,9 +118,8 @@ class AppModal extends BaseComponent {
       }
     });
 
-    // Fokusvagter
-    this.shadowRoot.querySelector('.focus-sentinel.start')?.addEventListener('focus', () => this.#focusLast());
-    this.shadowRoot.querySelector('.focus-sentinel.end')?.addEventListener('focus', () => this.#focusFirst());
+    // VIGTIGT: ingen focus-listeners på sentinels (de skabte rekursion)
+    // Sentinels bliver kun brugt som “hegnspæle” til skærmlæsere.
   }
 
   #reflectA11y() {
@@ -144,6 +140,9 @@ class AppModal extends BaseComponent {
   #handleOpen() {
     if (this._isPortaled || this._portaling) return;
     this._portaling = true;
+
+    // Gem fokusafsender FØR vi flytter fokus
+    this.#prevFocused = document.activeElement;
 
     // Portal
     if (!this._isPortaled) this.#portalToBody();
@@ -174,13 +173,17 @@ class AppModal extends BaseComponent {
     const dlg = this.shadowRoot.querySelector('.dialog');
     if (!dlg) return [];
     const sel = [
-      'a[href]','area[href]',
-      'button:not([disabled])',
-      'input:not([disabled]):not([type="hidden"])',
-      'select:not([disabled])','textarea:not([disabled])',
-      'iframe','audio[controls]','video[controls]',
-      '[contenteditable]:not([contenteditable="false"])',
-      '[tabindex]:not([tabindex="-1"])'
+      'a[href]:not(.focus-sentinel)',
+      'area[href]:not(.focus-sentinel)',
+      'button:not([disabled]):not(.focus-sentinel)',
+      'input:not([disabled]):not([type="hidden"]):not(.focus-sentinel)',
+      'select:not([disabled]):not(.focus-sentinel)',
+      'textarea:not([disabled]):not(.focus-sentinel)',
+      'iframe:not(.focus-sentinel)',
+      'audio[controls]:not(.focus-sentinel)',
+      'video[controls]:not(.focus-sentinel)',
+      '[contenteditable]:not([contenteditable="false"]):not(.focus-sentinel)',
+      '[tabindex]:not([tabindex="-1"]):not(.focus-sentinel)'
     ].join(',');
     return [...dlg.querySelectorAll(sel)]
       .filter(el => el.offsetParent !== null || el === document.activeElement);
@@ -188,6 +191,7 @@ class AppModal extends BaseComponent {
   #focusFirst(){ (this.#focusables()[0] || this.shadowRoot.querySelector('.dialog'))?.focus?.(); }
   #focusLast(){ (this.#focusables().pop() || this.shadowRoot.querySelector('.dialog'))?.focus?.(); }
   #trapTab(e){
+    if (e.key !== 'Tab') return;
     const items = this.#focusables();
     if (items.length === 0) { e.preventDefault(); this.shadowRoot.querySelector('.dialog')?.focus(); return; }
     const first = items[0], last = items[items.length-1];
