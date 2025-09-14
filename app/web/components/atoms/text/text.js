@@ -2,7 +2,7 @@ import { BaseComponent } from '/js/BaseComponent.js';
 
 class AppText extends BaseComponent {
   static get observedAttributes() {
-    return ['value', 'placeholder', 'max-length', 'name'];
+    return ['id', 'value', 'placeholder', 'max-length', 'name'];
   }
 
   async render() {
@@ -20,13 +20,15 @@ class AppText extends BaseComponent {
   }
 
   #setAttributes() {
+    const id = this.getAttribute('id') || '';
     const value = this.getAttribute('value') || '';
     const placeholder = this.getAttribute('placeholder') || '';
     const maxLength = this.getAttribute('max-length') || '';
     const name = this.getAttribute('name') || '';
 
-    const input = this.shadowRoot.querySelector('button');
+    const input = this.shadowRoot.querySelector('input');
 
+    input.setAttribute('id', id);
     input.setAttribute('value', value);
     input.setAttribute('placeholder', placeholder);
     input.setAttribute('max-length', maxLength);

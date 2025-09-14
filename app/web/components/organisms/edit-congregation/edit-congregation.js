@@ -5,48 +5,72 @@ class AppEditCongregation extends BaseComponent {
     return ['status'];
   }
 
+  // -----Elements-----
   #modal = null;
-
+  #cancelBtn = null;
+  #saveBtn = null;
+  #officialNameElement = null;
+  
   async render() {
     const status = this.getAttribute('status') || 'closed';
-
-    const html = await fetch('/components/organisms/edit-congregation/edit-congregation-markup')
-      .then(res => res.text());
-
+    const html = await fetch('/components/organisms/edit-congregation/edit-congregation-markup').then(res => res.text());
     this.shadowRoot.innerHTML = html;
+  
+    if (!this.hasAttribute('status')) this.setAttribute('status', status);
 
-    if(!status)
-      this.setAttribute('status', status);
-
+    this.#setElements();  
     this.#bindEvents();
+  }
 
+  #setElements() {
     this.#modal = this.shadowRoot?.querySelector('app-modal[name="edit-congregation"]');
+    this.#cancelBtn = this.shadowRoot.querySelector('app-button[name=cancel-button]');
+    this.#saveBtn = this.shadowRoot.querySelector('app-button[name=save-button]');
+    this.#officialNameElement = this.shadowRoot.querySelector('#congregation-official-name-form-text')
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
-    if(!oldValue || oldValue === newValue) return;
+    if (!oldValue || oldValue === newValue) return;
+  
     if (name === 'status') {
+      if (newValue === 'open') this.#readStorageData();
+  
       queueMicrotask(() => {
+        // 2) Re-hent modal hvis den er null
+        this.#modal ||= this.shadowRoot?.querySelector('app-modal[name="edit-congregation"]');
+        if (!this.#modal) return;
+  
         newValue === 'closed' ? this.#modal.closeModal() : this.#modal.openModal();
       });
     }
   }
+  
+  #readStorageData() {
+    const sd = sessionStorage.getItem('speakersheetData')
+    const partData = (sd && JSON.parse(sd).congregation) || {};
+
+    this.#fillForm(
+      partData.officialName      
+    );
+  }
+
+  #fillForm(officialName) {
+    if(officialName)
+      this.#officialNameElement.setAttribute('value', officialName);
+  }
 
   #bindEvents() {
-    const cancelBtn = this.shadowRoot.querySelector('app-button[name=cancel-button]');
-    const saveBtn = this.shadowRoot.querySelector('app-button[name=save-button]');
-    const cancelBtnEventName = cancelBtn.getAttribute('onclickeventname');
-    const saveBtnEventName = saveBtn.getAttribute('onclickeventname');
-    const modal = this.shadowRoot.querySelector('app-modal[name=edit-congregation]');
+    const cancelBtnEventName = this.#cancelBtn.getAttribute('onclickeventname');
+    const saveBtnEventName = this.#saveBtn.getAttribute('onclickeventname');
 
-    cancelBtn.addEventListener(cancelBtnEventName, e => {
+    this.#cancelBtn.addEventListener(cancelBtnEventName, e => {
       console.log('CANCEL')
       this.setAttribute('status', 'closed');
     });
 
-    saveBtn.addEventListener(saveBtnEventName, e => {
+    this.#saveBtn.addEventListener(saveBtnEventName, e => {
       // here save form
-      console.log('SAVE')
+      this.#officialNameElement.setAttribute('validation-text', 'Så det tror du?');
       this.setAttribute('status', 'closed');
     });
   }

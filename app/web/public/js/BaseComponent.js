@@ -33,6 +33,25 @@ export class BaseComponent extends HTMLElement {
     return el;
   }
 
+  toggleAttributeOn(el, name, value = '') {
+    if (!el) return;
+  
+    if (this.hasAttribute(name)) {
+      el.setAttribute(name, this.getAttribute(name) || value);
+    } else {
+      el.removeAttribute(name);
+    }
+  }
+
+  copyAttr(attr, target, fallback = null) {
+    if (this.hasAttribute(attr)) {
+      target.setAttribute(attr, this.getAttribute(attr) || fallback || '');
+    } else {
+      if (fallback) target.setAttribute(attr, fallback);
+      else target.removeAttribute(attr);
+    }
+  }
+
   // ---------- Event helpers ----------
 
   dispatchNamedEvent(eventName, detail = {}, opts = {}) {

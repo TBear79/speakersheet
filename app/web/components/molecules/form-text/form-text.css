@@ -7,10 +7,11 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.375rem; /* mellem label og rækken under */
+    padding-bottom: 1em;
   }
   
   /* label øverst */
-  .label {}
+  /* .label {} */
   
   /* input-rækken: input til venstre, validation til højre */
   .row {

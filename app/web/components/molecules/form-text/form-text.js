@@ -3,14 +3,13 @@ import { BaseComponent } from '/js/BaseComponent.js';
 class AppFormText extends BaseComponent {
   static get observedAttributes() {
     return [
-      'for',
+      'input-id',
       'label',
       'placeholder',
       'value',
       'max-length',
       'required',
       'aria-label',
-      'type',
       'validation-text',
       'validation-variant',
       'oninputeventname',
@@ -54,19 +53,19 @@ class AppFormText extends BaseComponent {
     const msg = this.#msg();
     if (!lbl || !inp || !msg) return;
 
-    // --- for/id binding ---
-    const forId = this.getAttribute('for') || this.#ensureId(inp);
+    // --- id binding ---
+    const forId = this.getAttribute('input-id') || this.#ensureId(inp);
     lbl.setAttribute('for', forId);
     lbl.setAttribute('text', this.getAttribute('label') || '');
-    this.toggleAttributeOn(lbl, 'required', this.hasAttribute('required'));
+    this.toggleAttributeOn(lbl, 'required');
 
     inp.setAttribute('id', forId);
+    inp.setAttribute('name', forId);
 
-    this.#copyAttr('placeholder', inp);
-    this.#copyAttr('value', inp);
-    this.#copyAttr('max-length', inp);
-    this.#copyAttr('type', inp, 'text');
-    this.#copyAttr('aria-label', inp);
+    this.copyAttr('placeholder', inp);
+    this.copyAttr('value', inp);
+    this.copyAttr('max-length', inp);
+    this.copyAttr('aria-label', inp);
 
     // --- validation ---
     const vText = this.getAttribute('validation-text');
@@ -89,7 +88,7 @@ class AppFormText extends BaseComponent {
 
     const emit = (evtName) => {
       const detail = {
-        id: this.getAttribute('for') || this.#input()?.getAttribute('id') || '',
+        id: this.getAttribute('id') || this.#input()?.getAttribute('id') || '',
         name: this.getAttribute('name') || '',
         value: this.value
       };
@@ -114,15 +113,6 @@ class AppFormText extends BaseComponent {
       el.setAttribute('id', id);
     }
     return id;
-  }
-
-  #copyAttr(attr, target, fallback = null) {
-    if (this.hasAttribute(attr)) {
-      target.setAttribute(attr, this.getAttribute(attr) || fallback || '');
-    } else {
-      if (fallback && attr === 'type') target.setAttribute(attr, fallback);
-      else target.removeAttribute(attr);
-    }
   }
 }
 
