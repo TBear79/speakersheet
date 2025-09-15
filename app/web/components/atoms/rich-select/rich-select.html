@@ -1,0 +1,21 @@
+<div class="rs">
+    <div class="rs__control">
+      <input class="rs__input"
+             role="combobox"
+             aria-autocomplete="list"
+             aria-expanded="false"
+             aria-haspopup="listbox"
+             aria-controls="listbox"
+             inputmode="text"
+             />
+      <button type="button" class="rs__toggle" aria-label="Åbn valgmenu" tabindex="-1">▾</button>
+    </div>
+  
+    <div class="rs__popup" part="popup">
+      <ul id="listbox" class="rs__list" role="listbox"></ul>
+    </div>
+  
+    <div class="rs__live" aria-live="polite" aria-atomic="true"></div>
+    <slot hidden></slot>
+  </div>
+  

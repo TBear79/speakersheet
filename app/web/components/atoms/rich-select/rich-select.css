@@ -1,0 +1,98 @@
+/*
+  app-rich-select styles (atom)
+  Endpoint: /components/atoms/rich-select/rich-select-styles
+
+  Design notes:
+  - Neumorphism-inspired control with soft insets
+  - Clear focus ring for accessibility
+  - Popup is full-width, floating with elevation
+  - Live region is visually hidden but accessible to screen readers
+
+  Custom properties you can override near the host:
+  --rs-bg:            background of control (default: var(--neu-bg, #f3f4f6))
+  --rs-fg:            text color (default: inherit)
+  --rs-radius:        border radius for control (default: 1rem)
+  --rs-padding-y:     control vertical padding (default: .5rem)
+  --rs-padding-x:     control horizontal padding (default: .75rem)
+  --rs-shadow-inset:  inset shadow (default uses light/dark mix)
+  --rs-popup-bg:      popup background (default: #fff)
+  --rs-popup-radius:  popup radius (default: .75rem)
+  --rs-popup-shadow:  popup elevation shadow
+  --rs-item-hover:    hover/active background color
+  --rs-muted:         muted text color (for no-result)
+*/
+
+.rs { position: relative; font: inherit; color: var(--rs-fg, inherit); }
+
+.rs__control {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: .25rem;
+  background: var(--rs-bg, var(--neu-bg, #f3f4f6));
+  border-radius: var(--rs-radius, 1rem);
+  padding: var(--rs-padding-y, .5rem) var(--rs-padding-x, .75rem);
+  box-shadow: var(--rs-shadow-inset, inset 4px 4px 8px rgba(0,0,0,.06), inset -4px -4px 8px rgba(255,255,255,.8));
+}
+
+.rs__input {
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  padding: 0;
+  min-width: 6rem;
+}
+
+.rs__input:disabled { color: #9ca3af; cursor: not-allowed; }
+
+.rs__toggle {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: .125rem .25rem;
+  border-radius: .5rem;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.08);
+}
+
+.rs__toggle:hover { box-shadow: 0 0 0 1px rgba(0,0,0,.16); }
+
+/* Focus ring on the whole control when input is focused */
+.rs__input:focus-visible ~ .rs__toggle,
+.rs__input:focus-visible { outline: none; }
+
+.rs__control:has(.rs__input:focus-visible) {
+  box-shadow: 0 0 0 3px rgba(59,130,246,.35), var(--rs-shadow-inset, inset 4px 4px 8px rgba(0,0,0,.06), inset -4px -4px 8px rgba(255,255,255,.8));
+}
+
+/* Popup */
+.rs__popup { position: absolute; z-index: 1000; left: 0; right: 0; margin-top: .25rem; display: none; }
+.rs--open .rs__popup { display: block; }
+
+.rs__list {
+  max-height: 14rem;
+  overflow: auto;
+  background: var(--rs-popup-bg, #fff);
+  border-radius: var(--rs-popup-radius, .75rem);
+  padding: .25rem;
+  box-shadow: var(--rs-popup-shadow, 0 10px 30px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.06));
+}
+
+.rs__item {
+  padding: .5rem .75rem;
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.rs__item:hover, .rs__item--active { background: var(--rs-item-hover, rgba(0,0,0,.06)); }
+
+.rs__nores { padding: .5rem .75rem; color: var(--rs-muted, #6b7280); cursor: default; }
+
+/* Live region: keep accessible but invisible */
+.rs__live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; clip-path: inset(50%); border: 0; padding: 0; margin: 0; }
+
+/* High contrast preference */
+@media (prefers-contrast: more) {
+  .rs__control { box-shadow: none; border: 2px solid currentColor; }
+  .rs__item--active { outline: 2px solid currentColor; }
+}
