@@ -22,10 +22,10 @@
   }
   
   /* input skal kunne fylde resten af bredden */
-  .input {
+  /* .input {
     flex: 1 1 16rem;
     min-width: 12rem;
-  }
+  } */
   
   /* validation-besked til højre, men kan hoppe nedenunder */
   .message {
@@ -34,7 +34,7 @@
   }
   
   @media (max-width: 420px) {
-    .input { min-width: 100%; }
+    /* .input { min-width: 100%; } */
     .message { flex-basis: 100%; }
   }
   
