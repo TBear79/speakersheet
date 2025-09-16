@@ -7,8 +7,8 @@ class AppValidationMessage extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch('/components/atoms/validation-message/validation-message-markup').then(r => r.text()),
-      fetch('/components/atoms/validation-message/validation-message-styles').then(r => r.text())
+      this.fetchWithCache('/components/atoms/validation-message/validation-message-markup'),
+      this.fetchWithCache('/components/atoms/validation-message/validation-message-styles')
     ]);
 
     this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;

@@ -7,8 +7,8 @@ class AppLink extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/link/link-markup`).then(res => res.text()),
-      fetch('/components/atoms/link/link-styles').then(res => res.text())
+      this.fetchWithCache('/components/atoms/link/link-markup'),
+      this.fetchWithCache('/components/atoms/link/link-styles')
     ]);
 
     this.shadowRoot.innerHTML = `

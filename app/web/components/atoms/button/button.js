@@ -7,8 +7,8 @@ class AppButton extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/button/button-markup`).then(res => res.text()),
-      fetch('/components/atoms/button/button-styles').then(res => res.text())
+      this.fetchWithCache('/components/atoms/button/button-markup'),
+      this.fetchWithCache('/components/atoms/button/button-styles')
     ]);
 
     this.shadowRoot.innerHTML = `

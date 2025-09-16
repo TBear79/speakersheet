@@ -12,8 +12,8 @@ class AppHome extends BaseComponent {
     const query = new URLSearchParams({ onNewPdfLinkClickEventName: this.#onNewPdfLinkClickEventName, onUploadAreaFileDropEventName: this.#onUploadAreaFileDropEventName  }).toString();
 
     const [html, css] = await Promise.all([
-      fetch(`/components/pages/home/home-markup?${query}`).then(res => res.text()),
-      fetch('/components/pages/home/home-styles').then(res => res.text()).catch(() => '')
+      this.fetchWithCache('/components/pages/home/home-markup'),
+      this.fetchWithCache('/components/pages/home/home-styles')
     ]);
 
     this.shadowRoot.innerHTML = `

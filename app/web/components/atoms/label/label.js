@@ -7,8 +7,8 @@ class AppLabel extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch('/components/atoms/label/label-markup').then(r => r.text()),
-      fetch('/components/atoms/label/label-styles').then(r => r.text())
+      this.fetchWithCache('/components/atoms/label/label-markup'),
+      this.fetchWithCache('/components/atoms/label/label-styles')
     ]);
 
     this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;

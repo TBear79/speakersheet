@@ -39,8 +39,8 @@ class AppText extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/text/text-markup`).then(res => res.text()),
-      fetch('/components/atoms/text/text-styles').then(res => res.text())
+      this.fetchWithCache('/components/atoms/text/text-markup'),
+      this.fetchWithCache('/components/atoms/text/text-styles')
     ]);
 
     this.shadowRoot.innerHTML = `

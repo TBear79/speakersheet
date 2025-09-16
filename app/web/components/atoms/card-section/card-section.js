@@ -11,8 +11,8 @@ class AppCardSection extends BaseComponent {
     }
 
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/card-section/card-section-markup`).then(res => res.text()),
-      fetch('/components/atoms/card-section/card-section-styles').then(res => res.text())
+      this.fetchWithCache('/components/atoms/card-section/card-section-markup'),
+      this.fetchWithCache('/components/atoms/card-section/card-section-styles')
     ]);
 
     this.shadowRoot.innerHTML = `

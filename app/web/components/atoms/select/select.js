@@ -46,9 +46,9 @@ export class Select extends BaseComponent {
     });
 
     const [html, css] = await Promise.all([
-      fetch(`/components/atoms/select/select-markup?${q}`).then(r => r.text()),
-      fetch('/components/atoms/select/select-styles').then(r => r.text()),
-    ]);
+        this.fetchWithCache('/components/atoms/select/select-markup'),
+        this.fetchWithCache('/components/atoms/select/select-styles')
+      ]);
 
     this.shadowRoot.innerHTML = `
       <style>${css}</style>

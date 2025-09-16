@@ -3,8 +3,8 @@ import { BaseComponent }  from '/js/BaseComponent.js'
 class AppCard extends BaseComponent {
     async connectedCallback() {
       const [html, css] = await Promise.all([
-        fetch('/components/organisms/footer/footer-markup').then(res => res.text()),
-        fetch('/components/organisms/footer/footer-styles').then(res => res.text())
+        this.fetchWithCache('/components/organisms/footer/footer-markup'),
+        this.fetchWithCache('/components/organisms/footer/footer-styles')
       ]);
   
       this.shadowRoot.innerHTML = `

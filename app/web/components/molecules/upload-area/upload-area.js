@@ -8,11 +8,9 @@ class AppUploadArea extends BaseComponent {
   #dragCounter = 0;
 
   async render() {
-    const query = new URLSearchParams({ isClickable: this.#isClickable() }).toString();
-
     const [html, css] = await Promise.all([
-      fetch(`/components/molecules/upload-area/upload-area-markup?${query}`).then(res => res.text()),
-      fetch('/components/molecules/upload-area/upload-area-styles').then(res => res.text())
+      this.fetchWithCache('/components/molecules/upload-area/upload-area-markup'),
+      this.fetchWithCache('/components/molecules/upload-area/upload-area-styles')
     ]);
 
     this.shadowRoot.innerHTML = `

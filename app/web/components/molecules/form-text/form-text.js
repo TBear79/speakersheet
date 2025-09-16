@@ -19,8 +19,8 @@ class AppFormText extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch('/components/molecules/form-text/form-text-markup').then(r => r.text()),
-      fetch('/components/molecules/form-text/form-text-styles').then(r => r.text())
+      this.fetchWithCache('/components/molecules/form-text/form-text-markup'),
+      this.fetchWithCache('/components/molecules/form-text/form-text-styles')
     ]);
 
     this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;

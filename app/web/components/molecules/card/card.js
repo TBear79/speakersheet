@@ -3,8 +3,8 @@ import { BaseComponent }  from '/js/BaseComponent.js'
 class AppCard extends BaseComponent {
     async connectedCallback() {
       const [html, css] = await Promise.all([
-        fetch('/components/molecules/card/card-markup').then(res => res.text()),
-        fetch('/components/molecules/card/card-styles').then(res => res.text())
+        this.fetchWithCache('/components/molecules/card/card-markup'),
+        this.fetchWithCache('/components/molecules/card/card-styles')
       ]);
   
       this.shadowRoot.innerHTML = `

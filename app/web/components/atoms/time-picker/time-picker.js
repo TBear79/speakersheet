@@ -64,14 +64,15 @@ export class AppTimePicker extends BaseComponent {
     this.#supportsNativeTime = AppTimePicker.detectNativeTimeSupport();
 
     // Hent markup og styles via endpoints (-markup / -styles)
-    const [htmlText, cssText] = await Promise.all([
-      fetch('/components/atoms/time-picker/time-picker-markup').then(r => r.text()),
-      fetch('/components/atoms/time-picker/time-picker-styles').then(r => r.text()),
+
+    const [html, css] = await Promise.all([
+      this.fetchWithCache('/components/atoms/time-picker/time-picker-markup'),
+      this.fetchWithCache('/components/atoms/time-picker/time-picker-styles')
     ]);
 
     this.shadowRoot.innerHTML = `
-      <style>${cssText}</style>
-      ${htmlText}
+      <style>${css}</style>
+      ${html}
     `;
 
     this.#cacheRefs();

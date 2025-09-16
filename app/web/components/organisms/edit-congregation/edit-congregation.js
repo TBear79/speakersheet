@@ -13,7 +13,8 @@ class AppEditCongregation extends BaseComponent {
   
   async render() {
     const status = this.getAttribute('status') || 'closed';
-    const html = await fetch('/components/organisms/edit-congregation/edit-congregation-markup').then(res => res.text());
+    const html = await this.fetchWithCache('/components/organisms/edit-congregation/edit-congregation-markup');
+
     this.shadowRoot.innerHTML = html;
   
     if (!this.hasAttribute('status')) this.setAttribute('status', status);

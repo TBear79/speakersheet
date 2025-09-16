@@ -22,42 +22,15 @@ class AppModal extends BaseComponent {
   #origParent = null;
   #origNext = null;
 
-  static _tplHtml = null;
-  static _tplCss = null;
-
   async render() {
     if (this._rendering) return;
     this._rendering = true;
 
     // 1) fetch templates kun første gang på tværs af alle instanser
-    if (!AppModal._tplHtml || !AppModal._tplCss) {
       const [html, css] = await Promise.all([
-        fetch('/components/atoms/modal/modal-markup').then(r => r.text()),
-        fetch('/components/atoms/modal/modal-styles').then(r => r.text())
+        this.fetchWithCache('/components/atoms/modal/modal-markup'),
+        this.fetchWithCache('/components/atoms/modal/modal-styles')
       ]);
-      AppModal._tplHtml = html;
-      AppModal._tplCss = css;
-    }
-
-    // 2) mount shadow kun første gang for denne instans
-    if (!this._mounted) {
-      const fallback = `
-        :host{position:fixed;inset:0;display:none;place-items:center;z-index:1000}
-        :host([open]){display:grid}
-        .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:1;z-index:0}
-        .dialog{z-index:1;background:#f3f4f6;padding:1rem;border-radius:1rem;max-width:min(92vw,720px);max-height:90dvh;overflow:auto;outline:none}
-      `;
-      const css = AppModal._tplCss || fallback;
-      const html = AppModal._tplHtml || `
-        <div class="backdrop" part="backdrop" aria-hidden="true"></div>
-        <div class="dialog" part="dialog" role="dialog" aria-modal="true" aria-labelledby="app-modal-title" tabindex="-1">
-          <header class="dialog-header"><slot name="title" id="app-modal-title"></slot></header>
-          <section class="dialog-content"><slot></slot></section>
-          <footer class="dialog-actions"><slot name="actions"></slot></footer>
-          <span class="focus-sentinel start" tabindex="0" aria-hidden="true"></span>
-          <span class="focus-sentinel end" tabindex="0" aria-hidden="true"></span>
-        </div>
-      `;
 
       this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;
       this.#wire();
@@ -68,10 +41,7 @@ class AppModal extends BaseComponent {
         if (this.open && !this._isPortaled) this.#handleOpen();
         this.#reflectA11y();
       });
-    } else {
-      // allerede mountet: kun opdater a11y
-      this.#reflectA11y();
-    }
+   
 
     this._rendering = false;
   }

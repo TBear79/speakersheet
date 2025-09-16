@@ -7,8 +7,8 @@ class AppImage extends BaseComponent {
   
     async render() {
       const [html, css] = await Promise.all([
-        fetch(`/components/atoms/image/image-markup`).then(res => res.text()),
-        fetch('/components/atoms/image/image-styles').then(res => res.text())
+        this.fetchWithCache('/components/atoms/image/image-markup'),
+        this.fetchWithCache('/components/atoms/image/image-styles')
       ]);
   
       this.shadowRoot.innerHTML = `

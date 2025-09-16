@@ -15,8 +15,8 @@ class AppFileButton extends BaseComponent {
 
   async render() {
     const [html, css] = await Promise.all([
-      fetch('/components/atoms/file-button/file-button-markup').then(r => r.text()),
-      fetch('/components/atoms/file-button/file-button-styles').then(r => r.text())
+      this.fetchWithCache('/components/atoms/file-button/file-button-markup'),
+      this.fetchWithCache('/components/atoms/file-button/file-button-styles')
     ]);
 
     this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;

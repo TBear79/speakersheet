@@ -67,12 +67,16 @@ export class AppFormField extends BaseComponent {
       AppFormField._tplCss = await fetch(`${compPath}/form-field-styles`).then(r => r.text());
     }
 
+    const [html, css] = await Promise.all([
+      this.fetchWithCache('/components/molecules/form-field/form-field-markup'),
+      this.fetchWithCache('/components/molecules/form-field/form-field-styles')
+    ]);
+
     // Shadow DOM
-    const html = `
-      <style>${AppFormField._tplCss}</style>
-      ${AppFormField._tplHtml}
+    this.shadowRoot.innerHTML = `
+      <style>${css}</style>
+      ${html}
     `;
-    this.shadowRoot.innerHTML = html;
 
     // refs
     this.#labelEl = this.shadowRoot.querySelector('app-label');

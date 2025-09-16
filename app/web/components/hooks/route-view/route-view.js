@@ -30,7 +30,7 @@ class AppRouteView extends BaseComponent {
     this.#postEvt = this.getAttribute('eventpost') || 'route:post';
     
     const [css] = await Promise.all([
-      fetch('/components/hooks/route-view/route-view-styles').then(res => res.text())
+      this.fetchWithCache('/components/hooks/route-view/route-view-styles'),
     ]);
 
     this.shadowRoot.innerHTML = `

@@ -26,6 +26,42 @@ export class BaseComponent extends HTMLElement {
     console.warn('BaseComponent.render() was called, but not implemented.');
   }
 
+  // ---------- Caching ----------
+
+  static _cache = new Map();    // key -> parsed value (string/json/…)
+  static _inflight = new Map(); // key -> Promise<parsed value>
+
+  async fetchWithCache(url, { init = { cache: 'force-cache' } } = {}) {
+    // 1) Cache hit
+    if (BaseComponent._cache.has(url)) {
+      return BaseComponent._cache.get(url);
+    }
+
+    // 2) In-flight: del samme promise
+    if (BaseComponent._inflight.has(url)) {
+      return BaseComponent._inflight.get(url);
+    }
+
+    // 3) Start én fælles opgave, der parser og cacher værdien
+    const p = (async () => {
+      const res = await fetch(url, init);
+      if (!res.ok) throw new Error(`Fetch ${res.status} ${res.statusText} for ${url}`);
+
+      const value = await res.text();
+
+      BaseComponent._cache.set(url, value);
+      return value;
+    })();
+
+    BaseComponent._inflight.set(url, p);
+
+    try {
+      return await p;
+    } finally {
+      BaseComponent._inflight.delete(url);
+    }
+  }
+  
   // ---------- Utilities ----------
   requireElement(selector, root = this.shadowRoot) {
     const el = root.querySelector(selector);

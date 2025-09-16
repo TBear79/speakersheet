@@ -118,8 +118,10 @@ export class AppRichSelect extends BaseComponent {
   }
 
   async render() {
-    const html = AppRichSelect._tplHtml ||= await fetch('/components/atoms/rich-select/rich-select-markup').then(r => r.text());
-    const css = AppRichSelect._tplCss ||= await fetch('/components/atoms/rich-select/rich-select-styles').then(r => r.text());
+    const [html, css] = await Promise.all([
+      this.fetchWithCache('/components/atoms/rich-select/rich-select-markup'),
+      this.fetchWithCache('/components/atoms/rich-select/rich-select-styles')
+    ]);
 
     this.shadowRoot.innerHTML = `<style>${css}</style>` + html;
 
