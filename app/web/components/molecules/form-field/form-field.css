@@ -3,12 +3,25 @@
   }
   
   /* container for hele feltet */
-  .field {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.375rem; /* mellem label og rækken under */
-    padding-bottom: 1em;
+  .input {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;      /* ingen wrap */
+    align-items: center;
   }
+  
+  /* Ét element i slot → fylder 100% */
+  ::slotted(:only-child) {
+    flex: 1 1 100%;
+  }
+  
+  /* Flere elementer → opfør dig som inline-blocks ved siden af hinanden */
+  ::slotted(*) {
+    flex: 0 0 auto;
+    min-width: 0;          /* forhindrer at content tvinger wrap */
+    white-space: nowrap;   /* undgå at indhold bryder internt */
+  }
+  
   
   /* label øverst */
   /* .label {} */
@@ -19,6 +32,12 @@
     align-items: flex-start;
     gap: 0.75rem;
     flex-wrap: wrap;        /* på small screens bryder validation nedenunder */
+  }
+  
+  /* input skal kunne fylde resten af bredden */
+  .input {
+    flex: 1 1 16rem;
+    min-width: 12rem;
   }
   
   /* validation-besked til højre, men kan hoppe nedenunder */

@@ -26,7 +26,7 @@ class AppEditCongregation extends BaseComponent {
     this.#modal = this.shadowRoot?.querySelector('app-modal[name="edit-congregation"]');
     this.#cancelBtn = this.shadowRoot.querySelector('app-button[name=cancel-button]');
     this.#saveBtn = this.shadowRoot.querySelector('app-button[name=save-button]');
-    this.#officialNameElement = this.shadowRoot.querySelector('#congregation-official-name-form-text')
+    this.#officialNameElement = this.shadowRoot.querySelector('#congregation-official-name')
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
