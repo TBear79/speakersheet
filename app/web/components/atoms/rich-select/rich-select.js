@@ -1,9 +1,17 @@
-// app-rich-select.js
+// components/atoms/rich-select/rich-select.js
 // -----------------------------------------------------------------------------
-// <app-rich-select name="country" placeholder="Vælg land" no-result-text="Ingen resultater" endpoint="/api/countries/search" min-chars="3"></app-rich-select>
+// <app-rich-select
+//   name="country"
+//   placeholder="Vælg land"
+//   no-result-text="Ingen resultater"
+//   endpoint="/api/countries/search"
+//   min-chars="3"
+//   autocomplete="off"
+//   typeahead="true"
+// ></app-rich-select>
 //
 // Slots:
-// - default: (optional) static options as light-DOM <option value="...">Label</option> elements
+// - default: (optional) statiske options som light-DOM <option value="...">Label</option>
 //
 // Attributes:
 // - name                : string identifier used in dispatched events
@@ -17,22 +25,16 @@
 // - typeahead           : boolean; enables inline suggestion completion (default on)
 //
 // Events:
-// - change              : fires when a value is chosen; detail: { value, label }
+// - change              : fires when a value is chosen; detail: { value, label, name }
 // - input               : fires on each keystroke; detail: { query }
 // - open/close          : when popup opens/closes
 // - fetch-start/fetch-end/fetch-error : for remote endpoint searches
 //
 // Keyboard & A11y:
-// - Implements ARIA Combobox pattern (input role=combobox, popup role=listbox, items role=option)
-// - ArrowDown/ArrowUp to move, Enter to select, Esc to close, Tab to accept current typed value
-// - Home/End jump in list, PageUp/PageDown move by 5
-// - Announces results via aria-live region
-//
-// Notes:
-// - Static options: place <option value="x">Label</option> children inside the element. They will be parsed.
-// - Remote search: when "endpoint" is set and input length >= min-chars, a debounced GET is made to `${endpoint}?q=${encodeURIComponent(query)}`.
-// - If both static options and endpoint exist, static options are used for short queries; remote results replace list once query >= min-chars.
-// - The special no-result item is focusable=false and not selectable.
+// - ARIA Combobox pattern (input role=combobox, popup role=listbox, items role=option)
+// - ArrowDown/ArrowUp to move, Enter to select, Esc/Tab to close
+// - Home/End jump, PageUp/PageDown move by 5
+// - Results announced via aria-live region
 // -----------------------------------------------------------------------------
 
 import { BaseComponent } from "/js/BaseComponent.js";
@@ -77,7 +79,9 @@ export class AppRichSelect extends BaseComponent {
   get autoComplete() { return this.getAttribute("autocomplete") || "off"; }
   set autoComplete(v) { this.setAttribute("autocomplete", v ?? "off"); }
 
-  get typeaheadEnabled() { return !this.hasAttribute("typeahead") || this.getAttribute("typeahead") !== "false"; }
+  get typeaheadEnabled() {
+    return !this.hasAttribute("typeahead") || this.getAttribute("typeahead") !== "false";
+  }
   set typeaheadEnabled(v) { this.setAttribute("typeahead", v ? "true" : "false"); }
 
   // ----- internals
@@ -85,7 +89,10 @@ export class AppRichSelect extends BaseComponent {
   _button = null;        // toggle
   _list = null;          // role=listbox
   _live = null;          // aria-live region
-  _wrapper = null;       // host container
+  _wrapper = null;       // host container (.rs)
+  _popup = null;         // .rs__popup (bliver i shadow)
+  _slot = null;
+
   _open = false;
   _options = [];         // { value, label, el }
   _filtered = [];        // filtered options
@@ -93,14 +100,21 @@ export class AppRichSelect extends BaseComponent {
   _debounceTimer = 0;
   _lastQuery = "";
   _isRemote = false;
-  _suppressTypeahead = false; // <-- backspace/delete guard
+  _suppressTypeahead = false;
 
-  static _tplHtml = null;
-  static _tplCss = null;
+  _onDocMouseDown = null;
+  _onScrollReposition = null;
+  _onResizeReposition = null;
 
   connectedCallback() {
     super.connectedCallback?.();
-    // Defer to render()
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('mousedown', this._onDocMouseDown, true);
+    window.removeEventListener('scroll', this._onScrollReposition, true);
+    window.removeEventListener('resize', this._onResizeReposition);
+    super.disconnectedCallback?.();
   }
 
   async render() {
@@ -111,10 +125,12 @@ export class AppRichSelect extends BaseComponent {
 
     // refs
     this._wrapper = this.shadowRoot.querySelector('.rs');
-    this._input = this.shadowRoot.querySelector('input[role="combobox"]');
-    this._button = this.shadowRoot.querySelector('.rs__toggle');
-    this._list = this.shadowRoot.querySelector('[role="listbox"]');
-    this._live = this.shadowRoot.querySelector('.rs__live');
+    this._input   = this.shadowRoot.querySelector('input[role="combobox"]');
+    this._button  = this.shadowRoot.querySelector('.rs__toggle');
+    this._popup   = this.shadowRoot.querySelector('.rs__popup');
+    this._list    = this.shadowRoot.querySelector('[role="listbox"]');
+    this._live    = this.shadowRoot.querySelector('.rs__live');
+    this._slot    = this.shadowRoot.querySelector('slot');
 
     // apply attrs
     this._input.placeholder = this.placeholder;
@@ -122,12 +138,16 @@ export class AppRichSelect extends BaseComponent {
     this._input.disabled = this.disabled;
     this._input.value = this.value;
 
-    // parse light-DOM <option> children
+    // parse static <option> children
     this.#loadStaticOptions();
     this.#syncList(this._options);
 
+    // bind events
     this.#bindEvents();
+
+    // initial state
     this.#reflectOpen(false);
+    this._isRemote = !!this.endpoint;
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -138,14 +158,19 @@ export class AppRichSelect extends BaseComponent {
       case 'disabled': if (this._input) this._input.disabled = this.disabled; break;
       case 'autocomplete': if (this._input) this._input.autocomplete = this.autoComplete; break;
       case 'endpoint': this._isRemote = !!this.endpoint; break;
-      case 'min-chars': /* no-op */ break;
-      case 'no-result-text': /* no-op */ break;
-      case 'typeahead': /* no-op */ break;
+      case 'min-chars':
+      case 'no-result-text':
+      case 'typeahead':
+        break;
     }
   }
 
-  // ----- private helpers
+  // ----- events
   #bindEvents() {
+    // Åben ved klik/fokus i input – så man kan vælge uden at skrive
+    this._input?.addEventListener('focus', () => { if (!this._open) this.#open(); });
+    this._input?.addEventListener('click', () => { if (!this._open) this.#open(); });
+
     // toggle button
     this._button?.addEventListener('click', () => {
       if (this.disabled) return;
@@ -165,7 +190,12 @@ export class AppRichSelect extends BaseComponent {
     this._input?.addEventListener('keydown', (e) => this.#onKeyDown(e));
 
     // click outside
-    document.addEventListener('mousedown', this.#onDocMouseDown, true);
+    this._onDocMouseDown = (e) => {
+      if (!this._open) return;
+      const inHost  = this.contains(e.target) || this.shadowRoot.contains(e.target);
+      if (!inHost) this.#close();
+    };
+    document.addEventListener('mousedown', this._onDocMouseDown, true);
 
     // option click (event delegation)
     this._list?.addEventListener('click', (e) => {
@@ -174,20 +204,25 @@ export class AppRichSelect extends BaseComponent {
       const idx = +item.dataset.index;
       this.#commitByIndex(idx);
     });
-  }
 
-  #onDocMouseDown = (e) => {
-    if (!this._open) return;
-    if (!this.contains(e.target) && !this.shadowRoot.contains(e.target)) {
-      this.#close();
-    }
+    // hold options i sync ved dynamisk slot-indhold
+    this._slot?.addEventListener('slotchange', () => {
+      this.#loadStaticOptions();
+      const q = (this._input?.value || '').trim();
+      q ? this.#filterAndMaybeFetch(q) : this.#syncList(this._options);
+      if (this._open) this.#positionPopup(); // hvis højde ændres
+    });
+
+    // repositionér ved scroll/resize
+    this._onScrollReposition = () => { if (this._open) this.#positionPopup(); };
+    this._onResizeReposition = () => { if (this._open) this.#positionPopup(); };
+    window.addEventListener('scroll', this._onScrollReposition, true);
+    window.addEventListener('resize', this._onResizeReposition, { passive: true });
   }
 
   #onKeyDown(e) {
-    // mark delete/backspace so we don't immediately re-apply typeahead
-    if (e.key === 'Backspace' || e.key === 'Delete') {
-      this._suppressTypeahead = true;
-    }
+    // mark delete/backspace så vi ikke autocompleter midt i redigering
+    if (e.key === 'Backspace' || e.key === 'Delete') this._suppressTypeahead = true;
 
     if (!this._open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       e.preventDefault();
@@ -213,31 +248,48 @@ export class AppRichSelect extends BaseComponent {
     }
   }
 
+  // ----- open/close
   #toggle() { this._open ? this.#close() : this.#open(); }
+
   #open() {
     if (this._open || this.disabled) return;
+    // Hvis remote uden query og ingen statiske options:
+    // vis tom liste med "Ingen resultater" (eller en custom tekst hvis du vil)
+    if (!this._options.length && this._isRemote && (this._input.value || '').trim().length < this.minChars) {
+      this._filtered = [];
+      this.#syncList(this._filtered, '');
+    } else if (!this._input.value) {
+      // tomt input -> vis alle lokale options
+      this._filtered = this._options.slice();
+      this.#syncList(this._filtered, '');
+    }
     this._open = true;
     this.#reflectOpen(true);
+    this.#positionPopup();
     this.dispatchEvent(new CustomEvent('open', { bubbles: true }));
   }
+
   #close() {
     if (!this._open) return;
     this._open = false;
     this.#reflectOpen(false);
     this.dispatchEvent(new CustomEvent('close', { bubbles: true }));
   }
+
   #reflectOpen(open) {
     this._wrapper?.classList.toggle('rs--open', !!open);
-    if (this._input) {
-      this._input.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
+    if (this._input) this._input.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
+  // ----- data ops
   #loadStaticOptions() {
-    const slot = this.shadowRoot.querySelector('slot');
-    const lightOpts = (slot?.assignedElements?.({ flatten: true }) || [])
-      .flatMap(el => el.tagName === 'OPTION' ? [el] : []);
-    this._options = lightOpts.map((opt, i) => ({ value: opt.value ?? '', label: opt.textContent?.trim() ?? '', el: null }));
+    // Bemærk: option-børn ligger i light-DOM inde i <app-rich-select>, ikke i shadow
+    const opts = Array.from(this.children).filter(el => el.tagName === 'OPTION');
+    this._options = opts.map(opt => ({
+      value: opt.value ?? '',
+      label: (opt.textContent || '').trim(),
+      el: null
+    }));
   }
 
   #filterAndMaybeFetch(q, inputType = '') {
@@ -252,6 +304,7 @@ export class AppRichSelect extends BaseComponent {
 
     if (!this._open) this.#open();
     if (this.typeaheadEnabled && !this.#shouldSuppressTypeahead(inputType)) this.#applyTypeahead(query);
+    if (this._open) this.#positionPopup(); // hold placering og max-height korrekt
   }
 
   #filterLocal(query) {
@@ -270,7 +323,9 @@ export class AppRichSelect extends BaseComponent {
         const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json(); // expects [{ value, label }]
-        this._filtered = Array.isArray(data) ? data.map(d => ({ value: String(d.value ?? ''), label: String(d.label ?? ''), el: null })) : [];
+        this._filtered = Array.isArray(data)
+          ? data.map(d => ({ value: String(d.value ?? ''), label: String(d.label ?? ''), el: null }))
+          : [];
         this.#syncList(this._filtered, query);
         this.dispatchEvent(new CustomEvent('fetch-end', { detail: { query, count: this._filtered.length }, bubbles: true }));
       } catch (err) {
@@ -278,12 +333,13 @@ export class AppRichSelect extends BaseComponent {
         this.dispatchEvent(new CustomEvent('fetch-error', { detail: { query, error: String(err) }, bubbles: true }));
         this._filtered = [];
         this.#syncList(this._filtered, query);
+      } finally {
+        if (this._open) this.#positionPopup();
       }
     }, 250);
   }
 
   #syncList(items, query = '') {
-    // Clear list
     this._list.innerHTML = '';
 
     if (!items.length) {
@@ -295,6 +351,7 @@ export class AppRichSelect extends BaseComponent {
       this._list.appendChild(li);
       this._activeIndex = -1;
       this.#announce(`${this.noResultText}.`);
+      // stadig mulighed for at klikke på toggle/input igen; listen er bare tom/disabled item
       return;
     }
 
@@ -312,12 +369,9 @@ export class AppRichSelect extends BaseComponent {
     });
     this._list.appendChild(frag);
 
-    // pick first by default after filtering
+    // pick first by default after filtering (så Enter virker straks)
     this.#setActive(items.length ? 0 : -1);
-
-    // ARIA activedescendant wiring
     this.#wireActiveDescendant();
-
     this.#announce(`${items.length} resultater.`);
   }
 
@@ -344,7 +398,10 @@ export class AppRichSelect extends BaseComponent {
   #moveActive(delta) { this.#setActive(this._activeIndex + delta); }
 
   #updateActiveStyles() {
-    this._list.querySelectorAll('.rs__item').forEach(el => el.classList.remove('rs__item--active'));
+    this._list.querySelectorAll('.rs__item').forEach(el => {
+      el.classList.remove('rs__item--active');
+      el.setAttribute('aria-selected', 'false');
+    });
     if (this._activeIndex >= 0) {
       const el = this._list.querySelector(`[data-index="${this._activeIndex}"]`);
       el?.classList.add('rs__item--active');
@@ -365,9 +422,12 @@ export class AppRichSelect extends BaseComponent {
     const it = this._filtered[idx];
     if (!it) return;
     this.value = it.value;
-    this._input.value = it.label; // display label in input
+    this._input.value = it.label; // vis label i inputfeltet
     this.#close();
-    this.dispatchEvent(new CustomEvent('change', { detail: { value: it.value, label: it.label, name: this.name }, bubbles: true }));
+    this.dispatchEvent(new CustomEvent('change', {
+      detail: { value: it.value, label: it.label, name: this.name },
+      bubbles: true
+    }));
   }
 
   #applyTypeahead(query) {
@@ -392,10 +452,48 @@ export class AppRichSelect extends BaseComponent {
     if (isDeletion) return true;
     const hasSelection = this._input.selectionStart !== this._input.selectionEnd;
     const caretAtEnd = this._input.selectionStart === this._input.value.length && this._input.selectionEnd === this._input.value.length;
-    // Suppress when editing mid-string or when a range is selected
     if (hasSelection) return true;
     if (!caretAtEnd) return true;
     return false;
+  }
+
+  // ----- placement: flip up if no space below (stay in shadow DOM)
+  #positionPopup() {
+    if (!this._popup) return;
+    // Sørg for at .rs (wrapper) er positioneret relativt (det er den i din CSS via .rs { position: relative; })
+    const ctrl = this.shadowRoot.querySelector('.rs__control');
+    if (!ctrl) return;
+
+    const gap = 4; // px afstand mellem control og popup
+    const r = ctrl.getBoundingClientRect();
+    const vh = window.innerHeight;
+
+    // Hvor meget plads har vi?
+    const spaceBelow = Math.max(0, vh - r.bottom - gap);
+    const spaceAbove = Math.max(0, r.top - gap);
+
+    // Hent listehøjde (naturlig) og sæt max-height inden vi flipper
+    const list = this._popup.querySelector('.rs__list');
+    const naturalMax = 14 * 16; // ~14rem som i CSS
+    const desired = Math.min(list?.scrollHeight || 0, naturalMax);
+
+    // Vælg position: nedenunder hvis pladsen er ok, ellers ovenover
+    const placeAbove = spaceBelow < Math.min(desired, 200) && spaceAbove > spaceBelow;
+
+    // Nulstil begge, sæt den ene
+    this._popup.style.top = '';
+    this._popup.style.bottom = '';
+    if (placeAbove) {
+      // popup over control
+      this._popup.style.bottom = `calc(100% + ${gap}px)`;
+      const maxH = Math.max(100, Math.min(spaceAbove, naturalMax)); // giv altid mindst ~100px
+      if (list) list.style.maxHeight = `${Math.round(maxH)}px`;
+    } else {
+      // popup under control
+      this._popup.style.top = `calc(100% + ${gap}px)`;
+      const maxH = Math.max(120, Math.min(spaceBelow, naturalMax));
+      if (list) list.style.maxHeight = `${Math.round(maxH)}px`;
+    }
   }
 }
 

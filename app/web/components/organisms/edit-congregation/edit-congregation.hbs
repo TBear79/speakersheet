@@ -11,7 +11,16 @@
 
   <app-form-text id="congregation-nick-name-form-text" input-id="congregation-nick-name" label="Kaldenavn" placeholder="Vestbyen"></app-form-text>
   <app-form-text id="congregation-address-form-text" input-id="congregation-address" label="Adresse" placeholder="Tempovej 3, 1234 Bjergkøbing" required></app-form-text>
-  <app-form-text id="congregation-circuit-form-text" input-id="congregation-circuit" label="Kreds" placeholder="DKS03" required></app-form-text>
+
+  <app-form-field label="Kreds" required>
+    <app-rich-select id="congregation-circuit" placeholder="DKS13" no-result-text="Ingen resultater">
+      <option value="DKS01">DKS01</option>
+      <option value="DKS02">DKS02</option>
+      <option value="DKS03">DKS03</option>
+      <option value="DKS04">DKS04</option>
+    </app-rich-select>
+  </app-form-field>
+
   <app-form-field label="Mødetidspunkt" required>
     <app-rich-select id="congregation-meeting-day" placeholder="Vælg ugedag" no-result-text="Ingen resultater">
       <option value="6">Lørdag</option>
@@ -19,6 +28,7 @@
     </app-rich-select>
     <time-picker id="congregation-meeting-time"  use-native="auto"></time-picker>
   </app-form-field>
+
   <app-button slot="actions" name="cancel-button" onclickeventname="editcongregation:modalcancelbutton:click">Annullér</app-button>
   <app-button slot="actions" name="save-button" variant="primary" onclickeventname="editcongregation:savebutton:click">Gem</app-button>
 </app-modal>
