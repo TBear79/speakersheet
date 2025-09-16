@@ -20,7 +20,7 @@ class AppViewSpeakersheet extends BaseComponent {
     }).toString();
 
     const [html, css] = await Promise.all([
-      this.fetchWithCache('/components/pages/view-speakersheet/view-speakersheet-markup'),
+      this.fetchWithCache(`/components/pages/view-speakersheet/view-speakersheet-markup?${query}`),
       this.fetchWithCache('/components/pages/view-speakersheet/view-speakersheet-styles')
     ]);
 
