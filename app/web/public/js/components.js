@@ -15,7 +15,7 @@ import '/components/atoms/validation-message/validation-message-script';
 
 import '/components/molecules/card/card-script';
 import '/components/molecules/form-text/form-text-script';
-import '/components/molecules/form-time-picker/form-time-picker-script';
+import '/components/molecules/form-field/form-field-script';
 import '/components/molecules/upload-area/upload-area-script';
 
 import '/components/organisms/edit-congregation/edit-congregation-script';
