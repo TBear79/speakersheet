@@ -1,0 +1,51 @@
+.select-root {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    min-width: 10rem;
+    border-radius: 1rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: inset 4px 4px 10px rgba(0,0,0,0.08),
+                inset -4px -4px 10px rgba(255,255,255,0.7);
+    background: var(--surface, #f3f4f6);
+  }
+  
+  .select-root:focus-within {
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.35),
+                inset 4px 4px 10px rgba(0,0,0,0.08),
+                inset -4px -4px 10px rgba(255,255,255,0.7);
+  }
+  
+  .select {
+    appearance: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    min-height: 1.875rem;
+  }
+  
+  .select:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+  }
+  
+  .chevron {
+    pointer-events: none;
+    padding-left: .5rem;
+  }
+  
+  :host([data-focus]) .select-root {
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.35),
+                inset 4px 4px 10px rgba(0,0,0,0.08),
+                inset -4px -4px 10px rgba(255,255,255,0.7);
+  }
+  :host([disabled]) .select {
+    cursor: not-allowed;
+  }
+  
