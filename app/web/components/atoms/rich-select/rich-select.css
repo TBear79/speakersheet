@@ -62,7 +62,10 @@
 .rs__input:focus-visible { outline: none; }
 
 .rs__control:has(.rs__input:focus-visible) {
-  box-shadow: 0 0 0 3px rgba(59,130,246,.35), var(--rs-shadow-inset, inset 4px 4px 8px rgba(0,0,0,.06), inset -4px -4px 8px rgba(255,255,255,.8));
+  /* box-shadow: 0 0 0 3px rgba(59,130,246,.35), var(--rs-shadow-inset, inset 4px 4px 8px rgba(0,0,0,.06), inset -4px -4px 8px rgba(255,255,255,.8)); */
+    box-shadow:
+      inset 2px 2px 4px #bebebe,
+      inset -2px -2px 4px #ffffff;
 }
 
 /* Popup */

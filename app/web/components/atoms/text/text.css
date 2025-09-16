@@ -1,14 +1,12 @@
 .app-text-input {
     width: 100%;
-    padding: 0.6rem 1rem;
     box-sizing: border-box;
     font-size: 1rem;
     border: none;
-    border-radius: 12px;
-    background: #e0e0e0;
-    box-shadow:
-      inset 4px 4px 8px #bebebe,
-      inset -4px -4px 8px #ffffff;
+    background: var(--rs-bg, var(--neu-bg, #f3f4f6));
+    border-radius: var(--rs-radius, 1rem);
+    padding: var(--rs-padding-y, .5rem) var(--rs-padding-x, .75rem);
+    box-shadow: var(--rs-shadow-inset, inset 4px 4px 8px rgba(0,0,0,.06), inset -4px -4px 8px rgba(255,255,255,.8));
     transition: box-shadow 0.2s ease;
   }
   
