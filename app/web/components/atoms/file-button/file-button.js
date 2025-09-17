@@ -71,7 +71,8 @@ class AppFileButton extends BaseComponent {
 
     // label åbner input automatisk (ingen klik-handler nødvendig)
     this._input.addEventListener('change', () => {
-      const eventName = this.getAttribute('onfileeventname') || 'file-selected';
+      
+      const eventName = this.getAttribute('onfileeventname') || 'filebutton:file:selected';
       this.dispatchNamedEvent(eventName, {
         files: this._input.files,
         name: this.getAttribute('name') || null

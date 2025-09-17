@@ -4,16 +4,29 @@
   <app-form-field label="Menighedsnavn" required>
      <app-text
       id="congregation-official-name"
-      placeholder="Bjergkøbing Vestbyen"
+      placeholder="Bjergkøbing Opperbakke"
       maxlength="100"
     ></app-text>
   </app-form-field>
 
-  <app-form-text id="congregation-nick-name-form-text" input-id="congregation-nick-name" label="Kaldenavn" placeholder="Vestbyen"></app-form-text>
-  <app-form-text id="congregation-address-form-text" input-id="congregation-address" label="Adresse" placeholder="Tempovej 3, 1234 Bjergkøbing" required></app-form-text>
+  <app-form-field label="Kaldenavn">
+     <app-text
+      id="congregation-nick-name"
+      placeholder="Opperbakke"
+      maxlength="100"
+    ></app-text>
+  </app-form-field>
+
+  <app-form-field label="Adresse" required>
+     <app-text
+      id="congregation-address"
+      placeholder="Tempovej 3, 1234 Bjergkøbing"
+      maxlength="100"
+    ></app-text>
+  </app-form-field>
 
   <app-form-field label="Kreds" required>
-    <app-rich-select id="congregation-circuit" placeholder="DKS13" no-result-text="Ingen resultater">
+    <app-rich-select id="congregation-circuit" placeholder="DKS13" no-result-text="Ingen resultater" placement="up">
       <option value="DKS01">DKS01</option>
       <option value="DKS02">DKS02</option>
       <option value="DKS03">DKS03</option>
@@ -22,7 +35,7 @@
   </app-form-field>
 
   <app-form-field label="Mødetidspunkt" required>
-    <app-rich-select id="congregation-meeting-day" placeholder="Vælg ugedag" no-result-text="Ingen resultater">
+    <app-rich-select id="congregation-meeting-day" placeholder="Vælg ugedag" no-result-text="Ingen resultater" placement="up">
       <option value="6">Lørdag</option>
       <option value="7">Søndag</option>
     </app-rich-select>
