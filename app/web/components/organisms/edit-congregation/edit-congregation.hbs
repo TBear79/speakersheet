@@ -1,23 +1,23 @@
 <app-modal name="edit-congregation" backdrop-close>
   <span slot="title">Redigér menighed</span>
 
-  <app-form-field label="Menighedsnavn" required>
+  <app-form-field id="edit-congregation__official-name" label="Menighedsnavn" required>
      <app-text
       id="congregation-official-name"
-      placeholder="Bjergkøbing Opperbakke"
+      placeholder="Bjergkøbing Overbakken"
       maxlength="100"
     ></app-text>
   </app-form-field>
 
-  <app-form-field label="Kaldenavn">
+  <app-form-field id="edit-congregation__nickname" label="Kaldenavn">
      <app-text
-      id="congregation-nick-name"
-      placeholder="Opperbakke"
+      id="congregation-nickname"
+      placeholder="Overbakken"
       maxlength="100"
     ></app-text>
   </app-form-field>
 
-  <app-form-field label="Adresse" required>
+  <app-form-field id="edit-congregation__address" label="Adresse" required>
      <app-text
       id="congregation-address"
       placeholder="Tempovej 3, 1234 Bjergkøbing"
@@ -25,8 +25,8 @@
     ></app-text>
   </app-form-field>
 
-  <app-form-field label="Kreds" required>
-    <app-rich-select id="congregation-circuit" placeholder="DKS13" no-result-text="Ingen resultater" placement="up">
+  <app-form-field id="edit-congregation__circuit" label="Kreds" required>
+    <app-rich-select id="congregation-circuit" placeholder="Vælg kreds" no-result-text="Ingen resultater" placement="up">
       <option value="DKS01">DKS01</option>
       <option value="DKS02">DKS02</option>
       <option value="DKS03">DKS03</option>
@@ -34,12 +34,12 @@
     </app-rich-select>
   </app-form-field>
 
-  <app-form-field label="Mødetidspunkt" required>
+  <app-form-field id="edit-congregation__meeting-date-time" label="Mødetidspunkt" required>
     <app-rich-select id="congregation-meeting-day" placeholder="Vælg ugedag" no-result-text="Ingen resultater" placement="up">
       <option value="6">Lørdag</option>
       <option value="7">Søndag</option>
     </app-rich-select>
-    <time-picker id="congregation-meeting-time"  use-native="auto"></time-picker>
+    <app-time-picker id="congregation-meeting-time"  use-native="auto"></app-time-picker>
   </app-form-field>
 
   <app-button slot="actions" name="cancel-button" onclickeventname="editcongregation:modalcancelbutton:click">Annullér</app-button>

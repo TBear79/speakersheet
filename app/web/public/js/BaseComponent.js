@@ -31,7 +31,7 @@ export class BaseComponent extends HTMLElement {
   static _cache = new Map();    // key -> parsed value (string/json/…)
   static _inflight = new Map(); // key -> Promise<parsed value>
 
-  async fetchWithCache(url, { init = { cache: 'force-cache' } } = {}) {
+  async fetchWithCache(url, { init = { cache: 'reload' } } = {}) {
     // 1) Cache hit
     if (BaseComponent._cache.has(url)) {
       return BaseComponent._cache.get(url);

@@ -84,7 +84,6 @@ export class AppRichSelect extends BaseComponent {
   get typeaheadEnabled() { return !this.hasAttribute("typeahead") || this.getAttribute("typeahead") !== "false"; }
   set typeaheadEnabled(v) { this.setAttribute("typeahead", v ? "true" : "false"); }
 
-  // placement control (force dropdown direction)
   // placement="auto" | "up" | "down" (default: auto)
   get placement() { return (this.getAttribute('placement') || 'auto').toLowerCase(); }
   set placement(v) { this.setAttribute('placement', (v ?? 'auto')); }
@@ -140,6 +139,7 @@ export class AppRichSelect extends BaseComponent {
     this._input.placeholder  = this.placeholder;
     this._input.autocomplete = this.autoComplete;
     this._input.disabled     = this.disabled;
+    this._input.setAttribute('id', this.getAttribute('id'))
 
     // state
     this._isRemote = !!this.endpoint;
@@ -172,9 +172,10 @@ export class AppRichSelect extends BaseComponent {
 
   // ----- events
   #bindEvents() {
-    // open on focus/click
-    this._input?.addEventListener('focus', () => { if (!this._open) this.#open(); });
-    this._input?.addEventListener('click',  () => { if (!this._open) this.#open(); });
+    // Åbn på click (ikke på focus)
+    this._input?.addEventListener('click',  () => {
+      if (!this._open) this.#open();
+    });
 
     // toggle button
     this._button?.addEventListener('click', () => {
@@ -183,12 +184,12 @@ export class AppRichSelect extends BaseComponent {
       if (this._open) this._input.focus();
     });
 
-    // typing
+    // typing (USER) -> må gerne åbne
     this._input?.addEventListener('input', (e) => {
       const q = this._input.value;
       const inputType = e?.inputType || '';
       this.dispatchEvent(new CustomEvent('input', { detail: { query: q }, bubbles: true }));
-      this.#filterAndMaybeFetch(q, inputType);
+      this.#filterAndMaybeFetch(q, inputType, /* suppressOpen */ false);
     });
 
     // keyboard
@@ -210,11 +211,15 @@ export class AppRichSelect extends BaseComponent {
       this.#commitByIndex(idx);
     });
 
-    // slot content changed (dynamic options)
+    // slot content changed (PROGRAM) -> må IKKE åbne
     this._slot?.addEventListener('slotchange', () => {
       this.#loadStaticOptions();
       const q = (this._input?.value || '').trim();
-      q ? this.#filterAndMaybeFetch(q) : this.#syncList(this._options);
+      if (q) {
+        this.#filterAndMaybeFetch(q, /* inputType */ '', /* suppressOpen */ true);
+      } else {
+        this.#syncList(this._options);
+      }
       this.#reconcileValueAndLabel();
       if (this._open) this.#positionPopup();
     });
@@ -305,7 +310,8 @@ export class AppRichSelect extends BaseComponent {
     if (this._input) this._input.value = display;
   }
 
-  #filterAndMaybeFetch(q, inputType = '') {
+  // NOTE: suppressOpen=true bruges til interne kald (fx slotchange) så popup ikke åbner.
+  #filterAndMaybeFetch(q, inputType = '', suppressOpen = false) {
     const query = (q || '').trim();
     this._lastQuery = query;
 
@@ -315,7 +321,7 @@ export class AppRichSelect extends BaseComponent {
       this.#filterLocal(query);
     }
 
-    if (!this._open) this.#open();
+    if (!suppressOpen && !this._open) this.#open();
     if (this.typeaheadEnabled && !this.#shouldSuppressTypeahead(inputType)) this.#applyTypeahead(query);
     if (this._open) this.#positionPopup();
   }
@@ -479,7 +485,7 @@ export class AppRichSelect extends BaseComponent {
 
     const list = this._popup.querySelector('.rs__list');
     const naturalMax = 14 * 16;          // ~14rem (matches CSS)
-    const measured   = Math.max(list?.scrollHeight || 0, 120); // ensure desired ≠ 0
+    const measured   = Math.max(list?.scrollHeight || 0, 120);
     const desired    = Math.min(measured, naturalMax);
 
     let placeAbove;

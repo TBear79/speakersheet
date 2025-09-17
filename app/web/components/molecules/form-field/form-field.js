@@ -40,6 +40,17 @@
 // - No custom keyboard handling; focus management stays with the inner control.
 //
 // ----------------------------------------------------------------------------
+// components/molecules/form-field/form-field.js
+// -----------------------------------------------------------------------------
+// Public API additions:
+// - getValue(): any              -> value of the FIRST control in slot
+// - getValues(): Record<string,any> -> map of { id|name: value } for ALL controls in slot
+//
+// Access from parent:
+//   const fld = this.shadowRoot.getElementById('edit-congregation__official-name');
+//   const one = fld.getValue();
+//   const all = fld.getValues();
+// -----------------------------------------------------------------------------
 import { BaseComponent } from '/js/BaseComponent.js';
 
 export class AppFormField extends BaseComponent {
@@ -50,23 +61,13 @@ export class AppFormField extends BaseComponent {
   /** private fields */
   #labelEl; #rowEl; #msgEl; #slot; #currentControl;
   #messageId; #cleanup = () => {};
-
-  static _tplHtml = null; // markup cache
-  static _tplCss = null;  // css cache
+  #lastControls = []; // cache af sidst fundne kontroller
 
   #rendering = true;
 
   get fieldState() { return (this.getAttribute('state') || 'default').toLowerCase(); }
 
   async render() {
-    const compPath = '/components/molecules/form-field';
-    if (!AppFormField._tplHtml) {
-      AppFormField._tplHtml = await fetch(`${compPath}/form-field-markup`).then(r => r.text());
-    }
-    if (!AppFormField._tplCss) {
-      AppFormField._tplCss = await fetch(`${compPath}/form-field-styles`).then(r => r.text());
-    }
-
     const [html, css] = await Promise.all([
       this.fetchWithCache('/components/molecules/form-field/form-field-markup'),
       this.fetchWithCache('/components/molecules/form-field/form-field-styles')
@@ -80,7 +81,6 @@ export class AppFormField extends BaseComponent {
 
     // refs
     this.#labelEl = this.shadowRoot.querySelector('app-label');
-
     this.#rowEl = this.shadowRoot.querySelector('.row');
     this.#msgEl = this.shadowRoot.querySelector('.message');
     this.#slot = this.shadowRoot.querySelector('slot');
@@ -112,7 +112,48 @@ export class AppFormField extends BaseComponent {
     }
   }
 
-  // ----- internals
+  // ========== PUBLIC API ==========
+  /** Returnerer værdien af første control i slottet */
+  getValue() {
+    const ctrl = this.#currentControl || this.#findFirstControl();
+    return this.#readValue(ctrl);
+  }
+
+  /** Returnerer et map { key: value } for alle kontroller i slottet */
+  getValues() {
+    const controls = this.#lastControls.length ? this.#lastControls : this.#collectControls();
+    const out = {};
+    let auto = 0;
+    for (const el of controls) {
+      let key = el.getAttribute?.('name') || el.getAttribute?.('id');
+      if (!key) key = `${(this.getAttribute('name') || 'field')}-${el.tagName.toLowerCase()}-${auto++}`;
+      while (Object.prototype.hasOwnProperty.call(out, key)) key = `${key}_${auto++}`;
+      out[key] = this.#readValue(el);
+    }
+    return out;
+  }
+
+  /** Sæt værdien af første control i slottet */
+  setValue(value) {
+    const controls = this.#lastControls.length ? this.#lastControls : this.#collectControls();
+
+    if(controls.length)
+      controls[0].setAttribute('value', value);
+  }
+
+  /** Modtager et map { key: value } og sætter værdien for alle kontroller i slottet */
+  setValues(valueMap) {
+    const controls = this.#lastControls.length ? this.#lastControls : this.#collectControls();
+
+    Object.entries(valueMap).forEach(([ key, value ]) => {
+      const ctrl = controls.find(x => x.id === key);
+
+      if(ctrl)
+        ctrl.setAttribute('value', value);
+    });
+  }
+
+  // ========== internals ==========
   #applyStaticAttrs() {
     this.#applyLabel();
     this.#applyMessageAndA11y();
@@ -168,6 +209,7 @@ export class AppFormField extends BaseComponent {
     const assigned = this.#slot.assignedElements({ flatten: true });
     const ctrl = this.#findFocusable(assigned);
     this.#currentControl = ctrl || null;
+    this.#lastControls = this.#collectControlsFrom(assigned);
     this.#linkLabelToControl();
     this.#applyMessageAndA11y();
   }
@@ -185,7 +227,7 @@ export class AppFormField extends BaseComponent {
 
   #isFocusable(el) {
     if (!el) return false;
-    const selector = 'input,select,textarea,button,[tabindex],time-picker,app-text';
+    const selector = 'input,select,textarea,button,[tabindex],app-time-picker,app-text,app-rich-select';
     return el.matches?.(selector) || false;
   }
 
@@ -201,11 +243,53 @@ export class AppFormField extends BaseComponent {
     }
     if (idToUse) this.#labelEl.setAttribute('for', idToUse);
   }
+
+  #findFirstControl() {
+    const assigned = this.#slot?.assignedElements?.({ flatten: true }) || [];
+    return this.#findFocusable(assigned);
+  }
+
+  #collectControls() {
+    const assigned = this.#slot?.assignedElements?.({ flatten: true }) || [];
+    return this.#collectControlsFrom(assigned);
+  }
+
+  #collectControlsFrom(nodes) {
+    const out = [];
+    for (const el of nodes) {
+      if (this.#isFocusable(el)) out.push(el);
+      // kig ind i shadow-root på custom controls (typiske input/select/textarea)
+      const inner = el.shadowRoot?.querySelectorAll?.('input,select,textarea');
+      if (inner?.length) inner.forEach(n => { if (this.#isFocusable(n)) out.push(n); });
+    }
+    return out;
+  }
+
+  #readValue(el) {
+    if (!el) return undefined;
+    // 1) native
+    if (el instanceof HTMLInputElement) {
+      if (el.type === 'checkbox') return !!el.checked;
+      if (el.type === 'radio')    return el.checked ? el.value : undefined;
+      return el.value;
+    }
+    if (el instanceof HTMLTextAreaElement) return el.value;
+    if (el instanceof HTMLSelectElement) {
+      if (el.multiple) return Array.from(el.selectedOptions).map(o => o.value);
+      return el.value;
+    }
+    // 2) custom element med value/getValue
+    if ('getValue' in el && typeof el.getValue === 'function') {
+      try { return el.getValue(); } catch { /* ignore */ }
+    }
+    if ('value' in el) {
+      try { return el.value; } catch { /* ignore */ }
+    }
+    // 3) fallback: kig efter indre native kontrol
+    const inner = el.shadowRoot?.querySelector?.('input,select,textarea');
+    if (inner) return this.#readValue(inner);
+    return undefined;
+  }
 }
 
 customElements.define('app-form-field', AppFormField);
-
-
-
-
-

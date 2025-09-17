@@ -33,6 +33,9 @@
 import { BaseComponent } from '/js/BaseComponent.js';
 
 class AppText extends BaseComponent {
+
+  #input;
+
   static get observedAttributes() {
     return ['id', 'value', 'placeholder', 'maxlength', 'name'];
   }
@@ -48,6 +51,8 @@ class AppText extends BaseComponent {
       ${html}
     `;
 
+    this.#input = this.shadowRoot.querySelector('input');
+
     this.#setAttributes();
   }
 
@@ -58,13 +63,11 @@ class AppText extends BaseComponent {
     const maxLength = this.getAttribute('maxlength') || '';
     const name = this.getAttribute('name') || '';
 
-    const input = this.shadowRoot.querySelector('input');
-
-    input.setAttribute('id', id);
-    input.setAttribute('value', value);
-    input.setAttribute('placeholder', placeholder);
-    if (maxLength) input.setAttribute('maxlength', maxLength);
-    input.setAttribute('name', name);
+    this.#input.setAttribute('id', id);
+    this.#input.setAttribute('value', value);
+    this.#input.setAttribute('placeholder', placeholder);
+    if (maxLength) this.#input.setAttribute('maxlength', maxLength);
+    this.#input.setAttribute('name', name);
   }
 }
 

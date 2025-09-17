@@ -483,4 +483,4 @@ export class AppTimePicker extends BaseComponent {
   }
 }
 
-customElements.define('time-picker', AppTimePicker);
+customElements.define('app-time-picker', AppTimePicker);
