@@ -7,10 +7,14 @@ class AppEditCongregation extends BaseComponent {
 
   // -----Elements-----
   #modal; #cancelBtn; #saveBtn;
-  #officialName; #nickname; #address; #circuit; #meetingDateTime
+  #officialName; #nickname; #address; #circuit; #meetingDayTime
   
+  #onDataUpdatedEventName
+
   async render() {
     const status = this.getAttribute('status') || 'closed';
+    this.#onDataUpdatedEventName = this.getAttribute('ondataupdatedeventname');
+
     const html = await this.fetchWithCache('/components/organisms/edit-congregation/edit-congregation-markup');
 
     this.shadowRoot.innerHTML = html;
@@ -30,7 +34,7 @@ class AppEditCongregation extends BaseComponent {
     this.#nickname = this.shadowRoot.getElementById('edit-congregation__nickname')
     this.#address = this.shadowRoot.getElementById('edit-congregation__address')
     this.#circuit = this.shadowRoot.getElementById('edit-congregation__circuit')
-    this.#meetingDateTime = this.shadowRoot.getElementById('edit-congregation__meeting-date-time')
+    this.#meetingDayTime = this.shadowRoot.getElementById('edit-congregation__meeting-date-time')
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
@@ -68,8 +72,7 @@ class AppEditCongregation extends BaseComponent {
     if(nickname) this.#nickname.setValue(nickname);
     if(address) this.#address.setValue(address);
     if(circuit) this.#circuit.setValue(circuit);
-    meetingDay = 'Søndag'; meetingTime='10:30';
-    if(meetingDay && meetingTime) this.#meetingDateTime.setValues({ 'congregation-meeting-day': meetingDay, 'congregation-meeting-time': meetingTime });
+    if(meetingDay && meetingTime) this.#meetingDayTime.setValues({ 'congregation-meeting-day': meetingDay, 'congregation-meeting-time': meetingTime });
   }
 
   #bindEvents() {
@@ -77,14 +80,13 @@ class AppEditCongregation extends BaseComponent {
     const saveBtnEventName = this.#saveBtn.getAttribute('onclickeventname');
 
     this.#cancelBtn.addEventListener(cancelBtnEventName, e => {
-      console.log('CANCEL')
       this.setAttribute('status', 'closed');
     });
 
     this.#saveBtn.addEventListener(saveBtnEventName, () => {
       if(!this.#validateFields()) return;
 
-      const meetingDateTime = this.#meetingDateTime.getValues();
+      const meetingDayTime = this.#meetingDayTime.getValues();
 
       this.#saveCongregation(
         {
@@ -92,8 +94,8 @@ class AppEditCongregation extends BaseComponent {
           nickname: this.#nickname.getValue(),
           address: this.#address.getValue(),
           circuit: this.#circuit.getValue(),
-          meetingDay: meetingDateTime['congregation-meeting-day'],
-          meetingDay: meetingDateTime['congregation-meeting-time'],
+          meetingDay: meetingDayTime['congregation-meeting-day'],
+          meetingTime: meetingDayTime['congregation-meeting-time'],
         }
       );
 
@@ -125,21 +127,23 @@ class AppEditCongregation extends BaseComponent {
   }
 
   #validateMeetingDateTime() {
-    const values = this.#meetingDateTime.getValues();
+    const values = this.#meetingDayTime.getValues();
 
     if(!values['congregation-meeting-day'] || !values['congregation-meeting-time']) {
-      this.#meetingDateTime.setAttribute('message', `"${this.#meetingDateTime.getAttribute('label')}" mangler at blive udfyldt`);
+      this.#meetingDayTime.setAttribute('message', `"${this.#meetingDayTime.getAttribute('label')}" mangler at blive udfyldt`);
       return false;
     }
 
-    this.#meetingDateTime.setAttribute('message', '');
+    this.#meetingDayTime.setAttribute('message', '');
     return true;
   }
 
   #saveCongregation(congregation) {
-    const sd = sessionStorage.getItem('speakersheetData');
+    const sd = JSON.parse(sessionStorage.getItem('speakersheetData'));
 
     sessionStorage.setItem('speakersheetData', JSON.stringify({...sd, congregation}));
+
+    this.dispatchNamedEvent(this.#onDataUpdatedEventName, congregation);
   }
 }
 

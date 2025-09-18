@@ -1,48 +1,37 @@
 <app-modal name="edit-congregation" backdrop-close>
   <span slot="title">Redigér menighed</span>
 
-  <app-form-field id="edit-congregation__official-name" label="Menighedsnavn" required>
-     <app-text
-      id="congregation-official-name"
-      placeholder="Bjergkøbing Overbakken"
-      maxlength="100"
-    ></app-text>
-  </app-form-field>
+  <div class="edit-congregation-stack">
+    <app-form-field class="form-element" id="edit-congregation__official-name" label="Menighedsnavn" required>
+      <app-text id="congregation-official-name" placeholder="Bjergkøbing Overbakken" maxlength="100"></app-text>
+    </app-form-field>
 
-  <app-form-field id="edit-congregation__nickname" label="Kaldenavn">
-     <app-text
-      id="congregation-nickname"
-      placeholder="Overbakken"
-      maxlength="100"
-    ></app-text>
-  </app-form-field>
+    <app-form-field class="form-element" id="edit-congregation__nickname" label="Kaldenavn">
+      <app-text id="congregation-nickname" placeholder="Overbakken" maxlength="100"></app-text>
+    </app-form-field>
 
-  <app-form-field id="edit-congregation__address" label="Adresse" required>
-     <app-text
-      id="congregation-address"
-      placeholder="Tempovej 3, 1234 Bjergkøbing"
-      maxlength="100"
-    ></app-text>
-  </app-form-field>
+    <app-form-field class="form-element" id="edit-congregation__address" label="Adresse" required>
+      <app-text id="congregation-address" placeholder="Tempovej 3, 1234 Bjergkøbing" maxlength="100"></app-text>
+    </app-form-field>
 
-  <app-form-field id="edit-congregation__circuit" label="Kreds" required>
-    <app-rich-select id="congregation-circuit" placeholder="Vælg kreds" no-result-text="Ingen resultater" placement="up">
-      <option value="DKS01">DKS01</option>
-      <option value="DKS02">DKS02</option>
-      <option value="DKS03">DKS03</option>
-      <option value="DKS04">DKS04</option>
-    </app-rich-select>
-  </app-form-field>
+    <app-form-field class="form-element" id="edit-congregation__circuit" label="Kreds" required>
+      <app-rich-select id="congregation-circuit" placeholder="Vælg kreds" no-result-text="Ingen resultater" placement="up">
+        <option value="DKS01">DKS01</option>
+        <option value="DKS02">DKS02</option>
+        <option value="DKS03">DKS03</option>
+        <option value="DKS04">DKS04</option>
+      </app-rich-select>
+    </app-form-field>
 
-  <app-form-field id="edit-congregation__meeting-date-time" label="Mødetidspunkt" required>
-    <app-rich-select id="congregation-meeting-day" placeholder="Vælg ugedag" no-result-text="Ingen resultater" placement="up">
-      <option value="6">Lørdag</option>
-      <option value="7">Søndag</option>
-    </app-rich-select>
-    <app-time-picker id="congregation-meeting-time"  use-native="auto"></app-time-picker>
-  </app-form-field>
+    <app-form-field class="form-element" id="edit-congregation__meeting-date-time" label="Mødetidspunkt" required>
+      <app-rich-select id="congregation-meeting-day" placeholder="Vælg ugedag" no-result-text="Ingen resultater" placement="up">
+        <option value="6">Lørdag</option>
+        <option value="0">Søndag</option>
+      </app-rich-select>
+      <app-time-picker id="congregation-meeting-time" use-native="auto"></app-time-picker>
+    </app-form-field>
+  </div>
 
   <app-button slot="actions" name="cancel-button" onclickeventname="editcongregation:modalcancelbutton:click">Annullér</app-button>
   <app-button slot="actions" name="save-button" variant="primary" onclickeventname="editcongregation:savebutton:click">Gem</app-button>
 </app-modal>
-

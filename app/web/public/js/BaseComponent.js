@@ -88,6 +88,15 @@ export class BaseComponent extends HTMLElement {
     }
   }
 
+  getWeekday(weekdayIndex) {
+    if(isNaN(weekdayIndex) || weekdayIndex < 0 || weekdayIndex > 6) {
+      console.error('Invalid weekday index', weekdayIndex);
+      return;
+    }
+
+      return ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'][weekdayIndex];
+  }
+
   // ---------- Event helpers ----------
 
   dispatchNamedEvent(eventName, detail = {}, opts = {}) {
@@ -122,10 +131,13 @@ export class BaseComponent extends HTMLElement {
     return tpl.content.cloneNode(true); // DocumentFragment
   }
 
-  setBindings(root, data) {
+  setBindings(root, data, formatters) {
     this.$all('[data-bind]', root).forEach(el => {
       const key = el.getAttribute('data-bind');
-      el.textContent = data?.[key] ?? '';
+      
+      const textContent = formatters && formatters[key] ? formatters[key](data?.[key]) : data?.[key];
+
+      el.textContent = textContent ?? '';
     });
   
     this.$all('[data-bind-attr]', root).forEach(el => {

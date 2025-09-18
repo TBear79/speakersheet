@@ -74,10 +74,7 @@ export class AppFormField extends BaseComponent {
     ]);
 
     // Shadow DOM
-    this.shadowRoot.innerHTML = `
-      <style>${css}</style>
-      ${html}
-    `;
+    this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;
 
     // refs
     this.#labelEl = this.shadowRoot.querySelector('app-label');

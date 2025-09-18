@@ -8,7 +8,7 @@
       <app-button class="congregation-button" variant="primary" onclickeventname="{{onCongregationEditClick}}">
         <span>Redigér</span>
       </app-button>
-      <app-edit-congregation status="closed"></app-edit-congregation>
+      <app-edit-congregation status="closed" ondataupdatedeventname="{{onDataUpdated}}"></app-edit-congregation>
     </div>
   </span>
 </app-card>
@@ -62,7 +62,13 @@
     <div class="row"><span class="label">Kaldenavn:</span><span class="value" data-bind="nickname"></span></div>
     <div class="row"><span class="label">Adresse:</span><span class="value" data-bind="address"></span></div>
     <div class="row"><span class="label">Kreds:</span><span class="value" data-bind="circuit"></span></div>
-    <div class="row"><span class="label">Mødetidspunkt:</span><span class="value" data-bind="meetingTime"></span></div>
+    <div class="row">
+      <span class="label">Mødetidspunkt:</span>
+      <div>
+        <span class="value" data-bind="meetingDay"></span>
+        <span class="value" data-bind="meetingTime"></span>
+      </div>
+    </div>
   </div>
 </template>
 

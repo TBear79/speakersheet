@@ -1,5 +1,6 @@
 :host {
     display: block;
+    margin-bottom:1rem;
   }
   
   /* container for hele feltet */
@@ -8,6 +9,10 @@
     gap: 0.5rem;
     flex-wrap: nowrap;      /* ingen wrap */
     align-items: center;
+  }
+
+  .label {
+    padding-left: 0.6rem;
   }
   
   /* Ét element i slot → fylder 100% */
@@ -46,8 +51,9 @@
     align-self: center;
   }
   
-  @media (max-width: 420px) {
+  @media (max-width: 768px) {
     .input { min-width: 100%; }
-    .message { flex-basis: 100%; }
+    .message { flex-basis: 100%; padding-left: 0.6rem; }
+    .row { gap: 0; }
   }
   

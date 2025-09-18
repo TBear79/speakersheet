@@ -8,6 +8,7 @@ class AppViewSpeakersheet extends BaseComponent {
   #onTalkCoordinatorEditClick = 'viewspeakersheet:talkcoordinatoredit:click';
   #onSpeakerAddClick = 'viewspeakersheet:speakeradd:click'
   #onSpeakerEditClick = 'viewspeakersheet:speakeredit:click';
+  #onDataUpdated = 'viewspeakersheet:data:updated';
 
   async render() {
     const query = new URLSearchParams({ 
@@ -15,7 +16,8 @@ class AppViewSpeakersheet extends BaseComponent {
       onElderCoordinatorEditClick: this.#onElderCoordinatorEditClick, 
       onTalkCoordinatorEditClick: this.#onTalkCoordinatorEditClick,
       onSpeakerAddClick: this.#onSpeakerAddClick,
-      onSpeakerEditClick: this.#onSpeakerEditClick
+      onSpeakerEditClick: this.#onSpeakerEditClick,
+      onDataUpdated: this.#onDataUpdated
       
     }).toString();
 
@@ -100,7 +102,7 @@ class AppViewSpeakersheet extends BaseComponent {
     const host = this.#cardContent('congregation');
     host.innerHTML = '';
     const node = this.cloneTpl('tpl-congregation');
-    this.setBindings(node, congregation);
+    this.setBindings(node, congregation, { 'meetingDay': this.getWeekday });
     host.appendChild(node);
   }
 
@@ -227,6 +229,7 @@ class AppViewSpeakersheet extends BaseComponent {
     this.#bindTalkCoordinatorEdit();
     this.#bindSpeakerCoordinatorAdd();
     this.#bindSpeakerCoordinatorEdit();
+    this.#bindDataUpdated();
   }
 
   #bindCongregationEdit() {
@@ -267,6 +270,12 @@ class AppViewSpeakersheet extends BaseComponent {
       }
 
       console.log('[speakerCoordinatorEdit]', id, e.composedPath());
+    });
+  }
+
+  #bindDataUpdated() {
+    this.addEventListener(this.#onDataUpdated, () => {
+      this.#setHtmlFromSessionStorage();
     });
   }
 }
