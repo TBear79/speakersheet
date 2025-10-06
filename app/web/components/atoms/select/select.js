@@ -1,207 +1,209 @@
+/**
+ * <app-select>
+ * -----------------------------------------------------------------------------
+ * Usage:
+ *   <app-select name="country" placeholder="Vælg land" value="DK">
+ *     <option value="DK">Danmark</option>
+ *     <option value="SE">Sverige</option>
+ *     <option value="NO" selected>Norge</option>
+ *   </app-select>
+ *
+ * Attributes:
+ * - name        : string; identifier included in events
+ * - value       : string; selected value (reflects)
+ * - placeholder : string; optional placeholder label (non-selectable)
+ * - disabled    : boolean; disables control
+ * - aria-label  : string; accessible name if no external label is present
+ *
+ * Methods:
+ * - getValue(): string
+ * - setValue(v: string): void
+ *
+ * Events:
+ * - "change": bubbles, composed. detail = { name, value }
+ *   (Fires when user picks an option or when value is set programmatically)
+ *
+ * A11y:
+ * - Uses native <select> semantics.
+ * - If you don’t pair with <app-label>, set [aria-label] on <app-select>.
+ *
+ * Notes:
+ * - Options are authored in light DOM and cloned into the shadow select at render().
+ * - Progressive enhancement: if (appearance: base-select) is supported,
+ *   a <button><selectedcontent></selectedcontent></button> is honored by the UA
+ *   for fully stylable popup & arrow (::picker(select), ::picker-icon, etc.).
+ */
+
 import { BaseComponent } from '/js/BaseComponent.js';
 
-export class Select extends BaseComponent {
+export class AppSelect extends BaseComponent {
   static get observedAttributes() {
-    return ['name','value','placeholder','disabled','required','autofocus'];
+    return ['name', 'value', 'disabled', 'placeholder', 'aria-label'];
   }
 
-  static formAssociated = true;
-
-  #select = null;
-  #internals = null;
-  #pendingOptionsClone = false;
-
-  get name() { return this.getAttribute('name') || ''; }
-  set name(v) { this.setAttribute('name', v ?? ''); }
-
-  get value() {
-    if (this.#select) return this.#select.value;
-    return this.getAttribute('value') ?? '';
-  }
+  /** Public API */
+  get value() { return this.getAttribute('value') ?? ''; }
   set value(v) {
-    if (v == null) v = '';
-    this.setAttribute('value', String(v));
-    if (this.#select && this.#select.value !== v) {
-      this.#select.value = v;
-      this.#syncFormValue();
-      this.#reflectValidity();
-    }
+    if (v === null || v === undefined) this.removeAttribute('value');
+    else this.setAttribute('value', String(v));
   }
-
   get disabled() { return this.hasAttribute('disabled'); }
   set disabled(v) { this.toggleAttribute('disabled', !!v); }
 
-  get required() { return this.hasAttribute('required'); }
-  set required(v) { this.toggleAttribute('required', !!v); }
-
-  get placeholder() { return this.getAttribute('placeholder') || ''; }
-  set placeholder(v) { this.setAttribute('placeholder', v ?? ''); }
+  /** Private fields */
+  #selectEl = null;
 
   async render() {
-    const q = new URLSearchParams({
-      placeholder: this.placeholder,
-      disabled: String(this.disabled),
-      required: String(this.required),
-      name: this.name
-    });
-
+    // Hent markup + styles via dit nye mønster
     const [html, css] = await Promise.all([
-        this.fetchWithCache('/components/atoms/select/select-markup'),
-        this.fetchWithCache('/components/atoms/select/select-styles')
-      ]);
+      this.fetchWithCache('/components/atoms/select/select-markup'),
+      this.fetchWithCache('/components/atoms/select/select-styles')
+    ]);
 
-    this.shadowRoot.innerHTML = `
-      <style>${css}</style>
-      ${html}
-    `;
+    this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;
 
-    this.#select = this.shadowRoot.querySelector('select');
+    this.#selectEl = this.shadowRoot.getElementById('native');
 
+    // A11y label fra host-attribut
+    const ariaLabel = this.getAttribute('aria-label') || '';
+    if (ariaLabel) this.#selectEl.setAttribute('aria-label', ariaLabel);
+
+    // Disabled state
+    this.#applyDisabled();
+
+    // Sync options ind i den interne select
+    this.#populateOptionsFromLightDom();
+
+    // Sæt initial value (ordre: host [value] → selected option i light DOM → placeholder)
+    this.#applyInitialValue();
+
+    // Events
     this.#bindEvents();
-    this.#populateOptionsFromLightDOM();
-
-    this.#select.required = this.required;
-    this.#select.disabled = this.disabled;
-
-    if (this.hasAttribute('value')) {
-      this.#select.value = this.getAttribute('value');
-    } else if (this.placeholder) {
-      this.#select.selectedIndex = 0;
-    }
-
-    if (this.hasAttribute('autofocus')) {
-      queueMicrotask(() => this.#select?.focus());
-    }
-
-    this.#syncFormValue();
-    this.#reflectValidity();
-  }
-
-  connectedCallback() {
-    super.connectedCallback?.();
-    const mo = new MutationObserver(() => {
-      this.#pendingOptionsClone = true;
-      queueMicrotask(() => {
-        if (this.#pendingOptionsClone) {
-          this.#populateOptionsFromLightDOM();
-          this.#pendingOptionsClone = false;
-        }
-      });
-    });
-    mo.observe(this, { childList: true, subtree: false });
-    this._optionsObserver = mo;
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback?.();
-    this._optionsObserver?.disconnect();
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
-    if (!this.shadowRoot?.isConnected) return;
+    if (!this.isConnected) return;
 
     switch (name) {
-      case 'value':
-        if (this.#select && this.#select.value !== newVal) {
-          this.#select.value = newVal ?? '';
-          this.#syncFormValue();
-          this.#reflectValidity();
-        }
-        break;
       case 'disabled':
-        if (this.#select) this.#select.disabled = this.disabled;
+        this.#applyDisabled();
         break;
-      case 'required':
-        if (this.#select) this.#select.required = this.required;
-        this.#reflectValidity();
+      case 'value':
+        this.#applyValueToSelect(newVal);
         break;
       case 'placeholder':
-        this.#injectOrUpdatePlaceholderOption();
+        // Rebuild options for placeholder changes
+        this.#populateOptionsFromLightDom();
+        this.#applyValueToSelect(this.getAttribute('value'));
+        break;
+      case 'aria-label':
+        if (this.#selectEl) {
+          if (newVal) this.#selectEl.setAttribute('aria-label', newVal);
+          else this.#selectEl.removeAttribute('aria-label');
+        }
         break;
     }
   }
 
+  /** Public API */
+  getValue() { return this.value; }
+  setValue(v) {
+    this.value = v ?? '';
+    // ensure event for programmatic changes (aligning with native select change semantics is optional)
+    this.#emitChange();
+  }
+
+  /** Internal */
   #bindEvents() {
-    this.#select?.addEventListener('change', () => {
-      this.setAttribute('value', this.#select.value);
-      this.#syncFormValue();
-      this.#reflectValidity();
-
-      this.dispatchEvent(new Event('change', { bubbles: true }));
-
-      const text = this.#select.selectedOptions?.[0]?.text ?? '';
-      this.dispatchEvent(new CustomEvent('app-select:change', {
-        bubbles: true,
-        detail: { name: this.name, value: this.#select.value, text }
-      }));
+    this.#selectEl.addEventListener('change', () => {
+      const current = this.#selectEl.value ?? '';
+      // Reflect til host
+      if (this.getAttribute('value') !== current) {
+        this.setAttribute('value', current);
+      } else {
+        // Hvis attribut allerede matcher, emitter vi stadig change (native gjorde det)
+        this.#emitChange();
+      }
     });
-
-    this.#select?.addEventListener('focus', () => this.setAttribute('data-focus', ''));
-    this.#select?.addEventListener('blur',  () => this.removeAttribute('data-focus'));
   }
 
-  #populateOptionsFromLightDOM() {
-    if (!this.#select) return;
-
-    const current = this.getAttribute('value') ?? '';
-    const hadPlaceholder = !!this.placeholder;
-    const placeholderHTML = hadPlaceholder ? this.#select.querySelector('option[data-placeholder]')?.outerHTML : '';
-    this.#select.innerHTML = placeholderHTML || '';
-
-    const options = Array.from(this.children).filter(ch => ch.tagName === 'OPTION');
-    for (const opt of options) {
-      this.#select.append(opt.cloneNode(true));
-    }
-
-    this.#injectOrUpdatePlaceholderOption();
-
-    if (current) {
-      this.#select.value = current;
-    } else if (this.placeholder) {
-      this.#select.selectedIndex = 0;
-    }
-
-    this.#syncFormValue();
+  #emitChange() {
+    const detail = { name: this.getAttribute('name') || '', value: this.value };
+    this.dispatchEvent(new CustomEvent('change', {
+      detail,
+      bubbles: true,
+      composed: true
+    }));
   }
 
-  #injectOrUpdatePlaceholderOption() {
-    if (!this.#select) return;
-    const has = this.placeholder && this.placeholder.trim().length > 0;
-    let ph = this.#select.querySelector('option[data-placeholder]');
+  #applyDisabled() {
+    if (!this.#selectEl) return;
+    this.#selectEl.disabled = this.disabled;
+  }
 
-    if (has && !ph) {
-      ph = document.createElement('option');
-      ph.setAttribute('data-placeholder', '');
+  #applyInitialValue() {
+    const hostVal = this.getAttribute('value');
+    if (hostVal !== null && hostVal !== undefined) {
+      this.#applyValueToSelect(hostVal);
+      return;
+    }
+    // Find første selected i light DOM (allerede klonet), ellers placeholder
+    const selectedInDom = this.#selectEl.querySelector('option[selected]');
+    if (selectedInDom) {
+      this.setAttribute('value', selectedInDom.value ?? '');
+      return;
+    }
+    // Hvis der er placeholder, så sæt value=""
+    const hasPlaceholder = !!this.getAttribute('placeholder');
+    if (hasPlaceholder) {
+      this.setAttribute('value', '');
+    }
+  }
+
+  #applyValueToSelect(v) {
+    if (!this.#selectEl) return;
+    const target = v ?? '';
+    // Sørg for at værdien findes; hvis ikke, falder vi tilbage til ""
+    const opt = [...this.#selectEl.options].find(o => o.value === target);
+    this.#selectEl.value = opt ? target : '';
+  }
+
+  #populateOptionsFromLightDom() {
+    if (!this.#selectEl) return;
+
+    // Gem evt. nuværende value, så vi bevarer valg efter rebuild
+    const prev = this.getAttribute('value');
+
+    // Ryd alle options (men behold første child, som er <button> til customizable-select)
+    const children = Array.from(this.#selectEl.childNodes);
+    for (const n of children) {
+      if (n.nodeType === Node.ELEMENT_NODE && n.tagName === 'BUTTON') continue;
+      this.#selectEl.removeChild(n);
+    }
+
+    // Placeholder (disabled/hidden), hvis satt
+    const placeholder = this.getAttribute('placeholder');
+    if (placeholder) {
+      const ph = document.createElement('option');
       ph.value = '';
-      ph.textContent = this.placeholder;
-      ph.disabled = true;
-      ph.selected = !this.hasAttribute('value');
-      this.#select.prepend(ph);
-    } else if (has && ph) {
-      ph.textContent = this.placeholder;
-      ph.selected = !this.hasAttribute('value');
-    } else if (!has && ph) {
-      ph.remove();
+      ph.textContent = placeholder;
+      ph.setAttribute('disabled', '');
+      ph.setAttribute('hidden', '');
+      ph.dataset.placeholder = 'true';
+      this.#selectEl.appendChild(ph);
     }
-  }
 
-  #syncFormValue() {
-    const v = this.#select?.value ?? '';
-    if (this.getAttribute('value') !== v) this.setAttribute('value', v);
-    try {
-      this.#internals?.setFormValue?.(v);
-      this.#internals?.setValidity?.({}, '');
-    } catch {}
-  }
+    // Klon alle <option> børn fra light DOM
+    const lightOptions = Array.from(this.querySelectorAll(':scope > option'));
+    for (const opt of lightOptions) {
+      this.#selectEl.appendChild(opt.cloneNode(true));
+    }
 
-  #reflectValidity() {
-    if (!this.required || !this.#select) return;
-    const valid = this.#select.value !== '';
-    try {
-      if (valid) this.#internals?.setValidity?.({});
-      else this.#internals?.setValidity?.({ valueMissing: true }, 'Vælg en værdi');
-    } catch {}
+    // Restore value hvis muligt
+    if (prev !== null && prev !== undefined) {
+      this.#applyValueToSelect(prev);
+    }
   }
 }
 
-customElements.define('app-select', Select);
+customElements.define('app-select', AppSelect);

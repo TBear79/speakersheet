@@ -1,5 +1,18 @@
-<div class="select-root" part="root">
-    <select class="select" part="select" aria-label="{{placeholder}}"></select>
-    <span class="chevron" part="chevron" aria-hidden="true">▾</span>
-  </div>
-  
+<!-- app-select markup -->
+<div class="select-wrap">
+  <!-- Native select lives in shadow DOM; options klones hertil fra light DOM -->
+  <select id="native" part="select" aria-label="">
+    <!-- MDN customizable-select button (progressive enhancement) -->
+    <button class="select-button" aria-hidden="true" tabindex="-1">
+      <selectedcontent></selectedcontent>
+    </button>
+    <!-- Options bliver indsat her via JS efter render -->
+  </select>
+
+  <!-- Ikonlag (fallback, hvis ::picker-icon ikke er tilgængelig) -->
+  <span class="chevron" aria-hidden="true"></span>
+</div>
+
+<!-- Vi beholder et slot til at modtage <option> i light DOM (brugeren skriver dem i markup). -->
+<!-- De bliver klonet over i #native og slottet skjules fra layout/AT. -->
+<slot id="options-slot" style="display:none;"></slot>

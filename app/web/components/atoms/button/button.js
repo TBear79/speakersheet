@@ -11,10 +11,7 @@ class AppButton extends BaseComponent {
       this.fetchWithCache('/components/atoms/button/button-styles')
     ]);
 
-    this.shadowRoot.innerHTML = `
-      <style>${css}</style>
-      ${html}
-    `;
+    this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;
 
     this.#setAttributes();
     this.addClickHandler();
